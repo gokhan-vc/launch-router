@@ -1,0 +1,15 @@
+{
+  "name": "@numetal/launch-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "vitest run" },
+  "dependencies": {
+    "@numetal/launch-kernel": "*",
+    "@numetal/adapter-clanker": "*",
+    "@numetal/adapter-bankr": "*",
+    "@numetal/adapter-poolsfun": "*"
+  },
+  "devDependencies": { "typescript": "^5.9.2", "vitest": "^3.2.4" }
+}

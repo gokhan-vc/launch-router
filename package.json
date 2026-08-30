@@ -1,0 +1,18 @@
+{
+  "name": "launch-router",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Numetal pad aggregator: user picks a launchpad, we build that pad's payload, they sign.",
+  "workspaces": [
+    "packages/*",
+    "packages/adapters/*"
+  ],
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
