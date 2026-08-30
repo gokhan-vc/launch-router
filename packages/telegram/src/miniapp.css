@@ -1,0 +1,144 @@
+:root {
+  color-scheme: dark;
+  --bg: var(--tg-theme-bg-color, #0e0e0e);
+  --fg: var(--tg-theme-text-color, #f4f4f2);
+  --muted: var(--tg-theme-hint-color, #8a8a86);
+  --line: var(--tg-theme-section-separator-color, #2a2a28);
+  --btn: var(--tg-theme-button-color, #e10600);
+  --btn-fg: var(--tg-theme-button-text-color, #fff);
+  --accent: var(--tg-theme-accent-text-color, #e10600);
+  --bad: var(--tg-theme-destructive-text-color, #e10600);
+  --ok: #3d8b5e;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 28rem;
+  padding: 1.25rem 1rem calc(2rem + env(safe-area-inset-bottom));
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0.2rem 0 0.4rem;
+}
+
+.who,
+.notes,
+.wallet {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 1rem;
+}
+
+.banner {
+  background: color-mix(in srgb, var(--bad) 16%, var(--bg));
+  border: 1px solid var(--bad);
+  padding: 0.6rem 0.75rem;
+  font-size: 13px;
+}
+
+form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+input,
+select,
+button,
+pre {
+  font: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--line);
+  background: var(--tg-theme-secondary-bg-color, #161616);
+  color: var(--fg);
+  border-radius: 0;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 14px;
+  color: var(--fg);
+}
+
+.check input {
+  width: auto;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.4rem;
+  margin: 1rem 0 0.5rem;
+}
+
+button {
+  padding: 0.7rem 0.4rem;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+}
+
+button.primary {
+  background: var(--btn);
+  color: var(--btn-fg);
+  border-color: var(--btn);
+}
+
+#status[data-kind="err"] {
+  color: var(--bad);
+}
+#status[data-kind="ok"] {
+  color: var(--ok);
+}
+#status {
+  font-size: 13px;
+  min-height: 2.4em;
+}
+
+pre {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--tg-theme-secondary-bg-color, #161616);
+  padding: 0.75rem;
+  max-height: 16rem;
+  overflow: auto;
+  border: 1px solid var(--line);
+}

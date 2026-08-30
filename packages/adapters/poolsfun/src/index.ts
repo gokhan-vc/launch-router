@@ -21,8 +21,8 @@ export type PoolsFunLaunchArgs = {
   deadline: number;
   creator: `0x${string}`;
   feeRecipient: `0x${string}`;
-  devBuyAmountIn: bigint;
-  devBuyMinOut: bigint;
+  devBuyAmountIn: string;
+  devBuyMinOut: string;
 };
 
 export function draftPoolsfun(
@@ -59,8 +59,8 @@ export function draftPoolsfun(
     deadline: extras.deadline,
     creator: i.creator as `0x${string}`,
     feeRecipient: (i.feeRecipient ?? i.creator) as `0x${string}`,
-    devBuyAmountIn: 0n,
-    devBuyMinOut: 0n,
+    devBuyAmountIn: "0",
+    devBuyMinOut: "0",
   };
   return {
     ok: true as const,

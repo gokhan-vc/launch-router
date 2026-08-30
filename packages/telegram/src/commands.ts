@@ -14,7 +14,7 @@ export function handleCommand(text: string): TgReply {
         "",
         ...lines,
         "",
-        "Chat cannot sign. Open the Mini App to confirm.",
+        "Chat cannot sign. Tap Open Mini App — you sign in the wallet there.",
       ].join("\n"),
     };
   }

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Launch router</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+    <link rel="stylesheet" href="./src/miniapp.css" />
+  </head>
+  <body>
+    <header>
+      <p class="kicker">NUMETAL · LAUNCH ROUTER</p>
+      <h1>Pick a pad. You sign.</h1>
+      <p class="who" id="who"></p>
+    </header>
+
+    <p id="unproven" class="banner" hidden>
+      This pad is on the matrix but has no proven deploy API. We will not fake a
+      transaction.
+    </p>
+
+    <form id="form" autocomplete="off">
+      <label>
+        Pad
+        <select id="pad"></select>
+      </label>
+      <p class="notes" id="pad-notes"></p>
+      <label>
+        Chain
+        <select id="chain"></select>
+      </label>
+      <label>
+        Name
+        <input id="name" required maxlength="32" placeholder="PALMS" />
+      </label>
+      <label>
+        Symbol
+        <input id="symbol" required maxlength="12" placeholder="PALMS" />
+      </label>
+      <label>
+        Image URL
+        <input id="image" placeholder="ipfs://… or https://…" />
+      </label>
+      <label>
+        Description
+        <input id="description" />
+      </label>
+      <label>
+        Metadata URI
+        <input id="metadata" />
+      </label>
+      <label>
+        Pair
+        <select id="pair">
+          <option value="WETH">WETH</option>
+          <option value="USDG">USDG</option>
+          <option value="RH_STOCK">RH stock (Pons only)</option>
+        </select>
+      </label>
+      <div id="fees-row">
+        <label>
+          Fee kind
+          <select id="feeKind">
+            <option value="static">static</option>
+            <option value="dynamic">dynamic</option>
+          </select>
+        </label>
+        <label>
+          Fee preset
+          <select id="feePreset">
+            <option>StaticBasic</option>
+            <option>DynamicBasic</option>
+            <option>Dynamic3</option>
+          </select>
+        </label>
+      </div>
+      <div id="pool-row">
+        <label>
+          v4 positions
+          <select id="positions">
+            <option>Standard</option>
+            <option>Project</option>
+            <option>TwentyETH</option>
+          </select>
+        </label>
+      </div>
+      <label class="check">
+        <input id="vanity" type="checkbox" />
+        Vanity address (Clanker)
+      </label>
+      <label>
+        Salt (pools.fun token0)
+        <input id="salt" placeholder="0x…" />
+      </label>
+      <label>
+        Creator (signer)
+        <input id="creator" placeholder="0x… or connect wallet" />
+      </label>
+    </form>
+
+    <div class="actions">
+      <button type="button" id="connect">Connect wallet</button>
+      <button type="button" id="simulate">Simulate</button>
+      <button type="button" id="sign" class="primary">Sign</button>
+    </div>
+    <p class="wallet" id="wallet">no wallet · router never holds keys</p>
+    <p id="status" data-kind="info">
+      Simulate builds the pad’s payload. Sign is your wallet. Chat cannot
+      broadcast.
+    </p>
+    <pre id="payload"></pre>
+    <script type="module" src="./src/miniapp.ts"></script>
+  </body>
+</html>

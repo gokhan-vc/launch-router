@@ -3,8 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/commands.ts" },
-  "scripts": { "test": "vitest run" },
-  "dependencies": { "@numetal/launch-kernel": "*" },
-  "devDependencies": { "typescript": "^5.9.2", "vitest": "^3.2.4" }
+  "exports": {
+    ".": "./src/commands.ts",
+    "./form": "./src/form.ts",
+    "./init-data": "./src/init-data.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@numetal/adapter-bankr": "*",
+    "@numetal/adapter-clanker": "*",
+    "@numetal/adapter-poolsfun": "*",
+    "@numetal/launch-kernel": "*",
+    "viem": "^2.33.0",
+    "clanker-sdk": "^4.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vite": "^7.1.2",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.28.0"
+  }
 }

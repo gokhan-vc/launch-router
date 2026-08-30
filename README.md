@@ -10,4 +10,7 @@ Telegram Bot API cannot sign. Humans confirm in a Mini App. Agents get `simulate
 
 ```bash
 npm test
+npm run dev:miniapp    # Telegram Mini App at http://localhost:5177
 ```
+
+The Mini App is the human surface. Chat cannot sign. Wallet is injected (MetaMask) in a browser preview; inside Telegram you need Privy or WalletConnect env vars. Worker: `npm run build:miniapp && npm run dev:worker`.
