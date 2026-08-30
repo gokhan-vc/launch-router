@@ -95,7 +95,7 @@ export const TOOL_DEFS: ToolDef[] = [
   {
     name: "get_sign_payload",
     description:
-      "Pad-sign payload for the user's wallet. Clanker = SDK deploy config. Bankr = simulateOnly POST body. pools.fun = PartyFactory args with mined salt. Never a REST argument the agent posts with a hot key.",
+      "Pad-sign payload for the user's wallet. Clanker = SDK deploy config. Bankr = simulateOnly POST body (Mini App may POST live with the user's key after the 57% split check — this tool never does). pools.fun = PartyFactory.launch tx (wallet sends). Never a REST argument the agent posts with a hot key.",
     inputSchema: {
       type: "object",
       properties: { intent: { type: "object", description: INTENT_DESC } },
@@ -138,9 +138,8 @@ export async function get_sign_payload(raw: unknown) {
       return draftBankr(raw);
     case "poolsfun":
       return draftPoolsfunMined(raw, {
-        expectedStartTick: r.intent.expectedStartTick ?? -190600,
-        deadline:
-          r.intent.deadline ?? Math.floor(Date.now() / 1000) + 3600,
+        expectedStartTick: r.intent.expectedStartTick,
+        deadline: r.intent.deadline ?? Math.floor(Date.now() / 1000) + 7200,
       });
     default:
       return {

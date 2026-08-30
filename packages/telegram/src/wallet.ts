@@ -6,6 +6,7 @@ import {
   type Hex,
 } from "viem";
 import { base, baseSepolia, mainnet, arbitrum, bsc } from "viem/chains";
+import { robinhood } from "@numetal/adapter-poolsfun";
 
 export type Connected = {
   address: `0x${string}`;
@@ -25,6 +26,7 @@ const CHAINS = {
   1: mainnet,
   42161: arbitrum,
   56: bsc,
+  4663: robinhood,
 } as const;
 
 function injected(): EthereumProvider | null {
@@ -110,6 +112,9 @@ export async function switchChain(
           chainName: chain.name,
           nativeCurrency: chain.nativeCurrency,
           rpcUrls: [...chain.rpcUrls.default.http],
+          blockExplorerUrls: chain.blockExplorers?.default?.url
+            ? [chain.blockExplorers.default.url]
+            : undefined,
         },
       ],
     });
@@ -128,4 +133,30 @@ export function walletClient(c: Connected, chainId: number) {
 export function publicClientFor(chainId: number) {
   const chain = CHAINS[chainId as keyof typeof CHAINS] ?? base;
   return createPublicClient({ chain, transport: http() });
+}
+
+/** Wallet broadcasts. Never sendRawTransaction through a public client. */
+export async function sendWalletTransaction(
+  provider: EthereumProvider,
+  tx: {
+    from: `0x${string}`;
+    to: `0x${string}`;
+    data: Hex;
+    value?: Hex;
+    chainId: number;
+  },
+): Promise<Hex> {
+  const hash = await provider.request({
+    method: "eth_sendTransaction",
+    params: [
+      {
+        from: tx.from,
+        to: tx.to,
+        data: tx.data,
+        value: tx.value ?? "0x0",
+        chainId: `0x${tx.chainId.toString(16)}`,
+      },
+    ],
+  });
+  return hash as Hex;
 }

@@ -5,7 +5,7 @@ import {
   type Hex,
   type PublicClient,
 } from "viem";
-import { PARTY_FACTORY } from "./factory.js";
+import { PARTY_FACTORY, RH_RPC, robinhood } from "./factory.js";
 
 export const COMPUTE_TOKEN_ADDRESS_ABI = [
   {
@@ -22,8 +22,6 @@ export const COMPUTE_TOKEN_ADDRESS_ABI = [
     outputs: [{ name: "", type: "address" }],
   },
 ] as const;
-
-const RH_RPC = "https://rpc.mainnet.chain.robinhood.com";
 
 export function saltFromInt(n: number): Hex {
   return `0x${n.toString(16).padStart(64, "0")}` as Hex;
@@ -54,6 +52,7 @@ export type MinedSalt = {
 
 export function defaultPoolsfunClient(): PublicClient {
   return createPublicClient({
+    chain: robinhood,
     transport: http(RH_RPC),
   }) as PublicClient;
 }

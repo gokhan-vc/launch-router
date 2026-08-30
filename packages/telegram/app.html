@@ -19,9 +19,10 @@
     </header>
 
     <p class="notes wallet-hint">
-      Telegram login mints an embedded EVM wallet (Privy) that can sign Clanker.
-      Official @wallet is TON and cannot. WalletConnect brings MetaMask / Rainbow
-      into the Mini App.
+      Telegram login mints an embedded EVM wallet (Privy) that can sign Clanker
+      and pools.fun. Official @wallet is TON and cannot. WalletConnect brings
+      MetaMask / Rainbow into the Mini App. Bankr Sign uses your Bankr user API
+      key, not this wallet.
     </p>
     <div class="actions wallets">
       <button type="button" id="connect-tg">Telegram wallet</button>
@@ -55,6 +56,16 @@
       <label id="custom-pair-row">Custom pair (0x…) <input id="customPair" placeholder="0x…" /></label>
       <label>Creator (signer) <input id="creator" placeholder="0x… or connect" /></label>
       <label>Fee recipient <input id="feeRecipient" placeholder="defaults to signer" /></label>
+      <label id="bankr-row" hidden>
+        Bankr user API key
+        <input
+          id="bankrKey"
+          type="password"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="bk_usr_… from bankr.bot/api-keys — never a partner key, never stored"
+        />
+      </label>
 
       <details id="advanced">
         <summary>Advanced</summary>
@@ -139,7 +150,7 @@
 
         <fieldset>
           <legend>pools.fun</legend>
-          <label>Start tick quote <input id="expectedStartTick" type="number" placeholder="-190600" /></label>
+          <label>Start tick quote <input id="expectedStartTick" type="number" placeholder="leave blank = live startTickFor" /></label>
           <label>Deadline (unix) <input id="deadline" type="number" /></label>
         </fieldset>
 
@@ -165,8 +176,8 @@
     </p>
     <p class="payload-caption" id="payload-caption">
       Simulate to see it. Clanker → SDK deploy config. Bankr → POST
-      /token-launches/deploy body with simulateOnly. pools.fun →
-      PartyFactory.launch args (1B / 1% / LP lock are factory-hardcoded).
+      /token-launches/deploy (simulate, then your user key). pools.fun →
+      PartyFactory.launch tx your wallet sends.
     </p>
     <pre id="payload"></pre>
     <script type="module" src="./src/miniapp.ts"></script>

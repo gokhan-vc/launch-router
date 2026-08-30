@@ -4,7 +4,7 @@
 
 Pick an existing launchpad. We build **that pad’s** payload. **The user signs.** Not a launchpad. Not [coins.numetal.xyz](https://coins.numetal.xyz).
 
-v0 wired: **Clanker**, **Bankr**, **pools.fun**. Unproven matrix: Pons, Feel.cash, pools.trade, pump.fun, Flap.
+v0 wired: **Clanker**, **Bankr**, **pools.fun** (Mini App live-signs all three). Unproven matrix: Pons, Feel.cash, pools.trade, pump.fun, Flap. Agents still never broadcast.
 
 **No broadcast tool.** Agents never hold keys.
 

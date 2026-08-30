@@ -52,12 +52,12 @@ Aeon (https://www.aeon.fun): same file is a crypto-pack skill (\`metadata.catego
 | Pad | Payload | Networks |
 |---|---|---|
 | clanker | Clanker SDK \`deploy()\` config | Base 8453, Base Sepolia 84532, Ethereum 1, Arbitrum 42161, BSC 56, Unichain 130, Robinhood 4663, Monad 143, Monad testnet 10143, Abstract 2741. Monad = static fees only. |
-| bankr | \`POST https://api.bankr.bot/token-launches/deploy\` body, \`simulateOnly: true\` | Base 8453, Robinhood 4663 |
-| poolsfun | \`PartyFactory.launch\` args (salt auto-mined) | Robinhood 4663. Factory hard-codes 1B supply, 1% fee, LP locked. |
+| bankr | \`POST https://api.bankr.bot/token-launches/deploy\` body, \`simulateOnly: true\`. Mini App may POST live with the **user** key after the 57% split check. Agents never do. Never partner keys. | Base 8453, Robinhood 4663 |
+| poolsfun | \`PartyFactory.launch\` tx (salt auto-mined, live \`startTickFor\`). Mini App wallet sends. Agents never send. | Robinhood 4663. Factory hard-codes 1B supply, 1% fee, LP locked. |
 
 ## Unproven (matrix only — no fake tx)
 
-pons (stock/ETH/USDG on Robinhood), feelcash, poolstrade, pumpfun (Solana — no EVM adapter), flap.
+pons (stock/ETH/USDG on Robinhood — no first-party encode path), feelcash / letscash.fun (SDK exists, not wired here), poolstrade (no public encode path), pumpfun (Solana — no EVM adapter), flap (no proven encode path).
 
 ## LaunchIntent knobs (optional)
 
@@ -70,8 +70,8 @@ Do not send JSON blobs unless the user already has one. Prefer URLs and percenta
 Not a public REST argument. It is the object the **wallet** signs:
 
 - clanker → \`kind: clanker-deploy-config\`
-- bankr → \`kind: bankr-deploy-simulate\`
-- poolsfun → \`kind: partyfactory-launch-args\`
+- bankr → \`kind: bankr-deploy-simulate\` (user key in Mini App only)
+- poolsfun → \`kind: partyfactory-launch-args\` (wallet \`eth_sendTransaction\` in Mini App)
 
 ## Discovery
 

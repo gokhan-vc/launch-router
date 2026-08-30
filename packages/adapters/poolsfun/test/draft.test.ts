@@ -24,6 +24,9 @@ describe("draftPoolsfun", () => {
       expect(r.payload.to).toBe(PARTY_FACTORY);
       expect(r.payload.args.pairedAsset).toBe(WETH_RH);
       expect(r.payload.args.creator).toBe(creator);
+      expect(r.payload.args.devBuyAmountIn).toBe("0");
+      expect(r.payload.tx.to).toBe(PARTY_FACTORY);
+      expect(r.payload.tx.data.startsWith("0xce61a35c")).toBe(true);
       expect(r.payload.hardcoded.fee).toBe("1%");
     }
   });

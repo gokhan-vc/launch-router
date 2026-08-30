@@ -231,8 +231,9 @@
           <article class="card">
             <h3>Simulate, then sign</h3>
             <p>
-              Simulate shows the object your wallet signs — not a REST argument. Live Sign in v0
-              is Clanker. Bankr and pools.fun stop at the payload. Unproven pads are blocked.
+              Simulate shows the object your wallet signs — not a REST argument. Live Sign:
+              Clanker (SDK), Bankr (your user API key, 57% split check, no partner keys),
+              pools.fun (wallet sends <code>PartyFactory.launch</code>). Unproven pads are blocked.
             </p>
           </article>
           <article class="card">
@@ -287,14 +288,14 @@
           <p>SDK deploy config. Base, Sepolia, ETH, Arb, BSC, Unichain, Robinhood, Monad, Abstract.</p>
         </div>
         <div class="pad">
-          <div class="k">Wired · payload</div>
+          <div class="k">Wired · live sign</div>
           <h3>Bankr</h3>
-          <p>simulateOnly POST body. Split 57 / 36.1 / 1.9 / 5 of 1.2%. Base + Robinhood.</p>
+          <p>Your user API key POSTs simulate then deploy. Split 57 / 36.1 / 1.9 / 5 of 1.2%. Never a partner key. Base + Robinhood.</p>
         </div>
         <div class="pad">
-          <div class="k">Wired · payload</div>
+          <div class="k">Wired · live sign</div>
           <h3>pools.fun</h3>
-          <p>PartyFactory.launch on Robinhood. Salt mined. 1B / 1% / LP lock are factory-hardcoded.</p>
+          <p>Your wallet sends PartyFactory.launch on Robinhood. Salt mined. Live startTickFor. 1B / 1% / LP lock are factory-hardcoded.</p>
         </div>
       </div>
     </main>

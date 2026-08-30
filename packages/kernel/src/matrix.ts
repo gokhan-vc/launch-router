@@ -50,7 +50,7 @@ export const MATRIX: PadCap[] = [
     chains: [8453, RH],
     knobs: ["image", "description", "feeRecipient"],
     forbidden: ["RH_STOCK", "fees.dynamic"],
-    notes: "1.2% swap; default split 57/36.1/1.9/5; immutable after deploy.",
+    notes: "1.2% swap; default split 57/36.1/1.9/5; immutable after deploy. Mini App POSTs with the user's Bankr key (never a partner key). Agents still stop at the simulate body.",
   },
   {
     id: "poolsfun",
@@ -66,7 +66,7 @@ export const MATRIX: PadCap[] = [
       "deadline",
     ],
     forbidden: ["fees", "fees.dynamic", "pool", "RH_STOCK"],
-    notes: "1B supply, 1% fee, LP locked — not knobs. WETH pair. creator=signer.",
+    notes: "1B supply, 1% fee, LP locked — not knobs. WETH pair. creator=signer. Mini App wallet sends PartyFactory.launch (live startTickFor, mined salt).",
   },
   {
     id: "pons",
@@ -82,7 +82,7 @@ export const MATRIX: PadCap[] = [
     chains: [8453, RH],
     knobs: ["image"],
     forbidden: [],
-    notes: "Ticker [A-Z0-9]{3,}. Hangul filler does not count.",
+    notes: "letscash.fun SDK exists (wallet-signed factory.launch, vanity …cc) but is not wired here — no fake deploy.",
   },
   {
     id: "poolstrade",

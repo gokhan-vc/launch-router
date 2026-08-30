@@ -37,8 +37,8 @@ It is **not** a public REST argument. After Simulate it is the **pad-sign payloa
 | Pad | `payload.kind` | What you sign |
 |---|---|---|
 | Clanker | `clanker-deploy-config` | Clanker SDK `deploy()` config |
-| Bankr | `bankr-deploy-simulate` | `POST /token-launches/deploy` body, `simulateOnly: true` |
-| pools.fun | `partyfactory-launch-args` | `PartyFactory.launch` named args (1B / 1% / LP lock are factory-hardcoded) |
+| Bankr | `bankr-deploy-simulate` | `POST /token-launches/deploy` — Simulate is `simulateOnly: true`; Sign POSTs live with the **user** key after the 57% split check. Partner keys refused. Key never leaves the page except to api.bankr.bot. |
+| pools.fun | `partyfactory-launch-args` | Wallet `eth_sendTransaction` of `PartyFactory.launch` (1B / 1% / LP lock are factory-hardcoded). Live `startTickFor`. |
 | unproven | — | no payload; we do not fake a tx |
 
 Advanced fields stay visible on every pad. If the pad ignores one, Simulate **warns** and omits it from that payload.
@@ -47,4 +47,4 @@ CREATE2 **salt is never a form field**. Clanker’s SDK fills it (and mines `0x�
 
 ## Pads
 
-Clanker live-sign in the Mini App (user wallet + SDK). Bankr and pools.fun: simulate + payload only — no fake tx. Unproven pads (Pons, Feel.cash, …) are labelled and blocked.
+Live Sign in the Mini App: Clanker (wallet + SDK), Bankr (user API key, never partner keys), pools.fun (wallet sends `PartyFactory.launch`). Unproven pads (Pons, Feel.cash, pools.trade, pump.fun, Flap) are labelled and blocked. letscash.fun has a public SDK but is not wired here.

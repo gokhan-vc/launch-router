@@ -50,10 +50,10 @@ A human in this chat: ask for missing fields. Unattended Aeon (cron / `workflow_
 | Pad | Payload | Networks |
 |---|---|---|
 | clanker | Clanker SDK `deploy()` config | Base 8453, Base Sepolia 84532, Ethereum 1, Arbitrum 42161, BSC 56, Unichain 130, Robinhood 4663, Monad 143, Monad testnet 10143, Abstract 2741. Monad = static fees only. |
-| bankr | `POST https://api.bankr.bot/token-launches/deploy` body, `simulateOnly: true` | Base 8453, Robinhood 4663 |
-| poolsfun | `PartyFactory.launch` args (salt auto-mined) | Robinhood 4663. Factory hard-codes 1B supply, 1% fee, LP locked. |
+| bankr | `POST https://api.bankr.bot/token-launches/deploy` body, `simulateOnly: true`. Mini App may POST live with the **user** key after the 57% split check. You never do. Never partner keys. | Base 8453, Robinhood 4663 |
+| poolsfun | `PartyFactory.launch` tx (salt auto-mined, live `startTickFor`). Mini App wallet sends. You never send. | Robinhood 4663. Factory hard-codes 1B supply, 1% fee, LP locked. |
 
-Unproven (matrix only — no fake tx): pons, feelcash, poolstrade, pumpfun (Solana), flap.
+Unproven (matrix only — no fake tx): pons, feelcash (letscash.fun SDK exists, not wired), poolstrade, pumpfun (Solana), flap.
 
 ## Steps
 

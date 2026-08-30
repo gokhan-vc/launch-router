@@ -30,6 +30,6 @@ export default defineConfig({
     host: true,
   },
   optimizeDeps: {
-    exclude: ["clanker-sdk"],
+    include: ["@openzeppelin/merkle-tree", "clanker-sdk", "clanker-sdk/v4"],
   },
 });
