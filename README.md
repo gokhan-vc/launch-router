@@ -4,9 +4,9 @@
 
 Pick an existing launchpad. We build **that pad’s** payload. **The user signs.** Not a launchpad. Not [coins.numetal.xyz](https://coins.numetal.xyz).
 
-v0 wired: **Clanker**, **Bankr**, **pools.fun** (Mini App live-signs all three). Unproven matrix: Pons, Feel.cash, pools.trade, pump.fun, Flap. Agents still never broadcast.
+v0 wired for **people and machines**: **Clanker**, **Bankr**, **pools.fun** — same payloads, same Sign. Unproven matrix: Pons, Feel.cash, pools.trade, pump.fun, Flap.
 
-**No broadcast tool.** Agents never hold keys.
+**No broadcast tool on this origin.** User wallet or user Bankr key. Worker never holds keys. Unattended Aeon notifies the payload and stops.
 
 ```bash
 npm test
@@ -48,7 +48,7 @@ We support **every chain a pad lists** — no extras. `list_networks` is the uni
 
 ## Mini App
 
-Optional signing skin at `/` (not required). Chat still cannot sign.
+Signing skin at `/app.html`. MCP `get_sign_payload` returns the same JSON. Chat still cannot hold keys.
 
 ```bash
 npm run dev:miniapp    # http://localhost:5177  foyer; /app.html is Sign

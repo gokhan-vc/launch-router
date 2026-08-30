@@ -2,7 +2,9 @@ export const LLMS_TXT = `# Numetal launch router — agent instructions
 
 You are talking to a **pad aggregator**, not a launchpad.
 Pick an existing pad. Build **that pad's** sign payload. **The user signs.**
-You never hold keys. There is **no** \`broadcast\`, \`send_transaction\`, or \`deploy\` tool.
+You never hold keys. There is **no** \`broadcast\`, \`send_transaction\`, or \`deploy\` tool on this origin.
+
+Humans (Mini App) and machines (MCP / REST / skill) get the **same** pads, knobs, payloads, and Sign steps.
 
 coins.numetal.xyz is the register of tokens already launched. Do not edit it.
 
@@ -38,22 +40,24 @@ Aeon (https://www.aeon.fun): same file is a crypto-pack skill (\`metadata.catego
 
 ## Always
 
-1. \`list_pads\` then \`get_capabilities\` for the chosen pad.
+1. \`list_pads\` then \`get_capabilities\` for the chosen pad. Each row includes \`howToSign\` — same steps as Mini App Sign.
 2. Fill \`LaunchIntent\`: \`name\`, \`symbol\`, \`chainId\`, \`pad\`, \`creator\` (0x signer).
 3. \`chainId\` MUST be in that pad's \`chains\`. Use \`list_networks\` for the union.
 4. Forbidden knobs: tell the user. Do not coerce. Stock pairing (\`RH_STOCK\`) is **Pons only**.
 5. Never ask for a CREATE2 salt. Clanker SDK fills it. pools.fun mines so the token sorts below WETH.
-6. \`simulate_launch\` / \`get_sign_payload\`. Show the result. **Stop.**
-7. Bankr: default split of the 1.2% swap is 57 / 36.1 / 1.9 / 5. If simulate returns anything else, refuse.
-8. Hand the payload to the user's wallet. Optional Mini App at \`{origin}/app.html\` is a signing skin, not required. Human foyer: \`https://launch.numetal.xyz/\`.
+6. \`simulate_launch\` / \`get_sign_payload\`. This is the same JSON the Mini App shows. Then Sign — do not stop at "payload only" when a human (or their wallet / Bankr user key) is here.
+7. Bankr: default split of the 1.2% swap is 57 / 36.1 / 1.9 / 5. After simulate, \`check_bankr_split\`. If anything else (including a partner share), refuse.
+8. Sign is the user's wallet or the user's Bankr \`bk_usr_\` key, on any surface. Mini App at \`{origin}/app.html\` is one skin, not the only one. Human foyer: \`https://launch.numetal.xyz/\`. Never send a Bankr key to this origin.
 
-## Wired pads (sign payload exists)
+## Wired pads (same Sign for humans and agents)
 
-| Pad | Payload | Networks |
-|---|---|---|
-| clanker | Clanker SDK \`deploy()\` config | Base 8453, Base Sepolia 84532, Ethereum 1, Arbitrum 42161, BSC 56, Unichain 130, Robinhood 4663, Monad 143, Monad testnet 10143, Abstract 2741. Monad = static fees only. |
-| bankr | \`POST https://api.bankr.bot/token-launches/deploy\` body, \`simulateOnly: true\`. Mini App may POST live with the **user** key after the 57% split check. Agents never do. Never partner keys. | Base 8453, Robinhood 4663 |
-| poolsfun | \`PartyFactory.launch\` tx (salt auto-mined, live \`startTickFor\`). Mini App wallet sends. Agents never send. | Robinhood 4663. Factory hard-codes 1B supply, 1% fee, LP locked. |
+| Pad | Payload (\`get_sign_payload\`) | Sign (user, any surface) | Networks |
+|---|---|---|---|
+| clanker | \`kind: clanker-deploy-config\` — Clanker SDK \`deploy()\` config | User wallet + SDK. Mini App Sign does this; an agent with the user's wallet does the same. | Base 8453, Base Sepolia 84532, Ethereum 1, Arbitrum 42161, BSC 56, Unichain 130, Robinhood 4663, Monad 143, Monad testnet 10143, Abstract 2741. Monad = static fees only. |
+| bankr | \`kind: bankr-deploy-simulate\` — \`POST https://api.bankr.bot/token-launches/deploy\` body + \`liveBody\` | User \`X-API-Key: bk_usr_…\` from **their** machine (Mini App, curl, or this agent process). Simulate → \`check_bankr_split\` → live. Never partner keys. Never POST the key to this origin. | Base 8453, Robinhood 4663 |
+| poolsfun | \`kind: partyfactory-launch-args\` — \`PartyFactory.launch\` \`tx\` (salt auto-mined, live \`startTickFor\`) | User wallet \`eth_sendTransaction(payload.tx)\` on 4663. creator == msg.sender. Mini App Sign does this; an agent with the user's wallet does the same. Factory hard-codes 1B supply, 1% fee, LP locked. | Robinhood 4663 |
+
+This origin never broadcasts. Unattended Aeon notifies the payload and stops.
 
 ## Unproven (matrix only — no fake tx)
 
@@ -67,11 +71,11 @@ Do not send JSON blobs unless the user already has one. Prefer URLs and percenta
 
 ## What the payload is
 
-Not a public REST argument. It is the object the **wallet** signs:
+Not a public REST argument. It is the object the **user** signs, identical on Mini App Simulate and MCP:
 
-- clanker → \`kind: clanker-deploy-config\`
-- bankr → \`kind: bankr-deploy-simulate\` (user key in Mini App only)
-- poolsfun → \`kind: partyfactory-launch-args\` (wallet \`eth_sendTransaction\` in Mini App)
+- clanker → \`kind: clanker-deploy-config\` + \`howToSign\`
+- bankr → \`kind: bankr-deploy-simulate\` + \`liveBody\` + \`headers\` + \`howToSign\`
+- poolsfun → \`kind: partyfactory-launch-args\` + \`tx\` + \`howToSign\`
 
 ## Discovery
 

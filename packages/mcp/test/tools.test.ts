@@ -68,4 +68,26 @@ describe("mcp tools", () => {
     const rows = (await dispatch("list_pads", {})) as { id: string }[];
     expect(rows.some((p) => p.id === "clanker")).toBe(true);
   });
+
+  it("offers the same howToSign to agents as the Mini App", async () => {
+    const rows = (await dispatch("list_pads", {})) as {
+      id: string;
+      howToSign: { surfaces: string[]; action: string };
+    }[];
+    for (const id of ["clanker", "bankr", "poolsfun"]) {
+      const row = rows.find((p) => p.id === id);
+      expect(row?.howToSign.surfaces).toEqual(
+        expect.arrayContaining(["mini-app", "mcp"]),
+      );
+    }
+    const split = (await dispatch("check_bankr_split", {
+      feeDistribution: {
+        creator: 5700,
+        bankr: 3610,
+        alt: 190,
+        protocol: 500,
+      },
+    })) as { ok: boolean };
+    expect(split.ok).toBe(true);
+  });
 });

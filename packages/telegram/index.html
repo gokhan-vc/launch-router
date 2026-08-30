@@ -231,7 +231,7 @@
           <article class="card">
             <h3>Simulate, then sign</h3>
             <p>
-              Simulate shows the object your wallet signs — not a REST argument. Live Sign:
+              Simulate shows the same JSON agents get from <code>get_sign_payload</code>. Live Sign:
               Clanker (SDK), Bankr (your user API key, 57% split check, no partner keys),
               pools.fun (wallet sends <code>PartyFactory.launch</code>). Unproven pads are blocked.
             </p>
@@ -245,13 +245,23 @@
         </section>
         <section class="col machines">
           <h2>Machines</h2>
-          <p class="who">Free discovery. User still signs. Amount 0 on x402 and MPP.</p>
+          <p class="who">Same pads. Same payloads. Same Sign. Amount 0 on x402 and MPP.</p>
           <article class="card">
             <h3>MCP</h3>
             <p>
               <a href="/mcp">POST /mcp</a> JSON-RPC, or stdio <code>npx tsx packages/mcp/src/stdio.ts</code>.
               Tools: list_pads, list_networks, get_capabilities, draft_intent, simulate_launch,
-              get_sign_payload. There is no broadcast.
+              get_sign_payload, check_bankr_split. Same JSON as Mini App Simulate. There is no
+              broadcast tool on this origin.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Simulate, then sign</h3>
+            <p>
+              Identical to people. Clanker: user wallet + SDK. Bankr: user’s <code>bk_usr_</code>
+              key POSTs simulate → 57% split check → live (never to this origin, never a partner
+              key). pools.fun: user wallet sends <code>PartyFactory.launch</code>. Unattended
+              agents notify the payload and stop.
             </p>
           </article>
           <article class="card">
@@ -265,8 +275,8 @@
             <h3>Skill</h3>
             <p>
               <a href="/skill.md">/skill.md</a> for Cursor, Claude, Grok, Codex, Aeon
-              (<code>category: crypto</code>, <code>mode: read-only</code>). Unattended Aeon
-              notifies the sign payload and stops.
+              (<code>category: crypto</code>, <code>mode: read-only</code>). Interactive agents
+              walk Sign. Unattended Aeon notifies the payload and stops.
             </p>
           </article>
           <article class="card">
@@ -283,19 +293,19 @@
 
       <div class="pads">
         <div class="pad">
-          <div class="k">Wired · live sign</div>
+          <div class="k">Wired · live sign · people and machines</div>
           <h3>Clanker</h3>
-          <p>SDK deploy config. Base, Sepolia, ETH, Arb, BSC, Unichain, Robinhood, Monad, Abstract.</p>
+          <p>SDK deploy config. Mini App or MCP. Base, Sepolia, ETH, Arb, BSC, Unichain, Robinhood, Monad, Abstract.</p>
         </div>
         <div class="pad">
-          <div class="k">Wired · live sign</div>
+          <div class="k">Wired · live sign · people and machines</div>
           <h3>Bankr</h3>
-          <p>Your user API key POSTs simulate then deploy. Split 57 / 36.1 / 1.9 / 5 of 1.2%. Never a partner key. Base + Robinhood.</p>
+          <p>User API key POSTs simulate then deploy. Split 57 / 36.1 / 1.9 / 5 of 1.2%. Mini App, MCP, or curl. Never a partner key. Base + Robinhood.</p>
         </div>
         <div class="pad">
-          <div class="k">Wired · live sign</div>
+          <div class="k">Wired · live sign · people and machines</div>
           <h3>pools.fun</h3>
-          <p>Your wallet sends PartyFactory.launch on Robinhood. Salt mined. Live startTickFor. 1B / 1% / LP lock are factory-hardcoded.</p>
+          <p>User wallet sends PartyFactory.launch on Robinhood. Mini App or MCP. Salt mined. Live startTickFor. 1B / 1% / LP lock are factory-hardcoded.</p>
         </div>
       </div>
     </main>

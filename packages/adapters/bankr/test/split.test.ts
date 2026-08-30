@@ -27,6 +27,10 @@ describe("bankr adapter", () => {
       expect(r.payload.body.tokenSymbol).toBe("X");
       expect(r.payload.body.chain).toBe("base");
       expect(r.payload.expectedSplit).toEqual(STANDARD_SPLIT);
+      expect(r.payload.liveBody.simulateOnly).toBe(false);
+      expect(r.payload.howToSign.surfaces).toEqual(
+        expect.arrayContaining(["mini-app", "mcp", "curl"]),
+      );
       expect(JSON.stringify(r.payload.body)).not.toMatch(/"name":/);
     }
   });

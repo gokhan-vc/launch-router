@@ -1,4 +1,4 @@
-import { MATRIX, capFor, type PadId } from "@numetal/launch-kernel";
+import { HOW_TO_SIGN, MATRIX, capFor, type PadId } from "@numetal/launch-kernel";
 import { draftClanker } from "@numetal/adapter-clanker";
 import {
   assertUserBankrKey,
@@ -153,7 +153,7 @@ function applyPadUi() {
   const cap = capFor(pad);
   renderChains(pad);
   renderPair(pad);
-  $("pad-notes").textContent = cap.notes;
+  $("pad-notes").textContent = [cap.notes, HOW_TO_SIGN[pad].action].join(" ");
   $("unproven").hidden = cap.status !== "unproven";
   const ignore: string[] = [];
   if (cap.forbidden.includes("fees")) ignore.push("fee kind/preset (factory hard-codes fee)");
@@ -202,11 +202,11 @@ function showPayload(obj: unknown) {
       : "";
   const captions: Record<string, string> = {
     "clanker-deploy-config":
-      "Clanker SDK deploy() config. Your wallet signs this. It is not a REST API request.",
+      "Same JSON MCP get_sign_payload returns. Clanker SDK deploy() config. Your wallet signs this. It is not a REST API request.",
     "bankr-deploy-simulate":
-      "Bankr POST /token-launches/deploy body. Simulate uses simulateOnly: true. Sign POSTs live with your user API key after the 57% split check. Partner keys are refused.",
+      "Same JSON MCP get_sign_payload returns. Bankr POST body + liveBody. Simulate then your user API key after the 57% split check. Partner keys refused. Key never goes to this origin.",
     "partyfactory-launch-args":
-      "pools.fun PartyFactory.launch tx. Salt mined so the token sorts below WETH. Sign sends this from your wallet (creator == msg.sender). 1B / 1% / LP lock are factory-hardcoded.",
+      "Same JSON MCP get_sign_payload returns. pools.fun PartyFactory.launch tx. Your wallet sends payload.tx (creator == msg.sender).",
   };
   $("payload-caption").textContent =
     captions[kind] ??

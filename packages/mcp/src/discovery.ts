@@ -13,7 +13,7 @@ export function x402WellKnown(origin: string) {
   return {
     x402Version: 2,
     serviceName: "Numetal launch router",
-    tags: ["launchpad", "clanker", "token", "mcp", "agent"],
+    tags: ["launchpad", "clanker", "bankr", "poolsfun", "token", "mcp", "agent"],
     resources: TOOL_DEFS.map((t) => ({
       resource: `${origin}/mcp`,
       type: "mcp",
@@ -33,7 +33,7 @@ export function x402WellKnown(origin: string) {
         bazaar: {
           discoverable: true,
           category: "crypto",
-          tags: ["launchpad", "clanker", "token", "mcp", "agent"],
+          tags: ["launchpad", "clanker", "bankr", "poolsfun", "token", "mcp", "agent"],
           info: {
             input: {
               type: "mcp",
@@ -57,7 +57,7 @@ export function mppWellKnown(origin: string) {
     version: 1,
     name: "Numetal launch router",
     description:
-      "Pad aggregator. Simulate a launch on Clanker/Bankr/pools.fun. User signs. Free.",
+      "Pad aggregator. Same Sign for humans and agents on Clanker/Bankr/pools.fun. User signs. Free.",
     origin,
     price: "0",
     currency: "USD",

@@ -67,4 +67,17 @@ describe("landing", () => {
     expect(landing).toContain("IBM Plex Serif");
     expect(landing).not.toMatch(/IBM Plex Mono|ui-monospace|SF Mono/);
   });
+
+  it("offers the same live Sign to people and machines", () => {
+    expect(landing).toContain("col people");
+    expect(landing).toContain("col machines");
+    const people = landing.split('class="col machines"')[0];
+    const machines = landing.split('class="col machines"')[1];
+    for (const col of [people, machines]) {
+      expect(col).toMatch(/Clanker/i);
+      expect(col).toMatch(/Bankr/i);
+      expect(col).toMatch(/PartyFactory\.launch/);
+    }
+    expect(landing).toMatch(/people and machines/i);
+  });
 });

@@ -1,4 +1,5 @@
 import {
+  HOW_TO_SIGN,
   MATRIX,
   capFor,
   networks,
@@ -16,6 +17,7 @@ export const TOOLS = [
   "draft_intent",
   "simulate_launch",
   "get_sign_payload",
+  "check_bankr_split",
 ] as const;
 
 export const FORBIDDEN_TOOLS = [
@@ -45,7 +47,7 @@ export const TOOL_DEFS: ToolDef[] = [
   {
     name: "list_pads",
     description:
-      "List every pad in the matrix (wired + unproven) with chains and notes. Call this first.",
+      "List every pad in the matrix (wired + unproven) with chains, notes, and howToSign. Same matrix the Mini App uses. Call this first.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -57,7 +59,7 @@ export const TOOL_DEFS: ToolDef[] = [
   {
     name: "get_capabilities",
     description:
-      "Knobs, forbidden fields, chains, and status for one pad. Stock pairing is Pons only.",
+      "Knobs, forbidden fields, chains, status, and howToSign for one pad. Same as the Mini App. Stock pairing is Pons only.",
     inputSchema: {
       type: "object",
       properties: {
@@ -84,7 +86,7 @@ export const TOOL_DEFS: ToolDef[] = [
   {
     name: "simulate_launch",
     description:
-      "Build the pad-sign payload (same as get_sign_payload). Does not broadcast. No keys.",
+      "Build the pad-sign payload (same object as Mini App Simulate and get_sign_payload). Does not broadcast. No keys.",
     inputSchema: {
       type: "object",
       properties: { intent: { type: "object", description: INTENT_DESC } },
@@ -95,11 +97,28 @@ export const TOOL_DEFS: ToolDef[] = [
   {
     name: "get_sign_payload",
     description:
-      "Pad-sign payload for the user's wallet. Clanker = SDK deploy config. Bankr = simulateOnly POST body (Mini App may POST live with the user's key after the 57% split check — this tool never does). pools.fun = PartyFactory.launch tx (wallet sends). Never a REST argument the agent posts with a hot key.",
+      "Same pad-sign payload the Mini App Sign uses. Clanker = SDK deploy() config. Bankr = POST body + liveBody + howToSign (user's bk_usr_ key on their machine; this origin never sees it). pools.fun = PartyFactory.launch tx. Never a REST argument this origin posts with a hot key.",
     inputSchema: {
       type: "object",
       properties: { intent: { type: "object", description: INTENT_DESC } },
       required: ["intent"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "check_bankr_split",
+    description:
+      "Same 57% split check the Mini App runs before a Bankr live POST. Pass feeDistribution from a simulate response. Refuses partner shares. No keys.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        feeDistribution: {
+          type: "object",
+          description:
+            "Bankr feeDistribution (flat bps or nested { bps }). Expected 5700/3610/190/500.",
+        },
+      },
+      required: ["feeDistribution"],
       additionalProperties: false,
     },
   },
@@ -113,6 +132,7 @@ export function list_pads() {
     knobs: p.knobs,
     forbidden: p.forbidden,
     notes: p.notes,
+    howToSign: HOW_TO_SIGN[p.id],
   }));
 }
 
@@ -121,7 +141,8 @@ export function list_networks() {
 }
 
 export function get_capabilities(pad: PadId) {
-  return capFor(pad);
+  const cap = capFor(pad);
+  return { ...cap, howToSign: HOW_TO_SIGN[pad] };
 }
 
 export function draft_intent(raw: unknown) {
@@ -173,6 +194,8 @@ export async function dispatch(
       return simulate_launch(args.intent ?? args);
     case "get_sign_payload":
       return get_sign_payload(args.intent ?? args);
+    case "check_bankr_split":
+      return acceptSimulatedSplit(args.feeDistribution ?? args);
     default:
       throw new Error(`unknown tool ${name}`);
   }

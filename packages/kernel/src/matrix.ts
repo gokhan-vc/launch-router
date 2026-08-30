@@ -50,7 +50,7 @@ export const MATRIX: PadCap[] = [
     chains: [8453, RH],
     knobs: ["image", "description", "feeRecipient"],
     forbidden: ["RH_STOCK", "fees.dynamic"],
-    notes: "1.2% swap; default split 57/36.1/1.9/5; immutable after deploy. Mini App POSTs with the user's Bankr key (never a partner key). Agents still stop at the simulate body.",
+    notes: "1.2% swap; default split 57/36.1/1.9/5; immutable after deploy. User Bankr key (bk_usr_) POSTs simulate then live after the split check — Mini App, MCP, or curl. Never a partner key. Worker never sees the key.",
   },
   {
     id: "poolsfun",
@@ -66,7 +66,7 @@ export const MATRIX: PadCap[] = [
       "deadline",
     ],
     forbidden: ["fees", "fees.dynamic", "pool", "RH_STOCK"],
-    notes: "1B supply, 1% fee, LP locked — not knobs. WETH pair. creator=signer. Mini App wallet sends PartyFactory.launch (live startTickFor, mined salt).",
+    notes: "1B supply, 1% fee, LP locked — not knobs. WETH pair. creator=signer. User wallet sends PartyFactory.launch (live startTickFor, mined salt) — Mini App, MCP, or any wallet. Same tx object.",
   },
   {
     id: "pons",

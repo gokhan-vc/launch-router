@@ -8,3 +8,4 @@ export {
   type NetworkRow,
 } from "./matrix.js";
 export { route, type RouteResult } from "./route.js";
+export { HOW_TO_SIGN, type HowToSign } from "./signing.js";

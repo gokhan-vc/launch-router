@@ -1,4 +1,4 @@
-import { route, type LaunchIntent } from "@numetal/launch-kernel";
+import { HOW_TO_SIGN, route, type LaunchIntent } from "@numetal/launch-kernel";
 import { FEE_CONFIGS, POOL_POSITIONS } from "clanker-sdk";
 
 function dropUndef<T extends Record<string, unknown>>(obj: T): T {
@@ -102,7 +102,8 @@ export function draftClanker(raw: unknown) {
       pad: "clanker" as const,
       kind: "clanker-deploy-config" as const,
       config,
-      note: "This JSON is the Clanker SDK deploy config your wallet signs. It is not a REST API request.",
+      howToSign: HOW_TO_SIGN.clanker,
+      note: "Same Clanker SDK deploy() config for Mini App Sign and MCP get_sign_payload. The user's wallet signs. Not a REST request.",
     },
   };
 }

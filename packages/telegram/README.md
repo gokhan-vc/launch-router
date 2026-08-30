@@ -47,4 +47,4 @@ CREATE2 **salt is never a form field**. Clankerâ€™s SDK fills it (and mines `0xâ
 
 ## Pads
 
-Live Sign in the Mini App: Clanker (wallet + SDK), Bankr (user API key, never partner keys), pools.fun (wallet sends `PartyFactory.launch`). Unproven pads (Pons, Feel.cash, pools.trade, pump.fun, Flap) are labelled and blocked. letscash.fun has a public SDK but is not wired here.
+Live Sign is the same for Mini App and MCP: Clanker (wallet + SDK), Bankr (user API key, never partner keys), pools.fun (wallet sends `PartyFactory.launch`). Unproven pads (Pons, Feel.cash, pools.trade, pump.fun, Flap) are labelled and blocked. letscash.fun has a public SDK but is not wired here.

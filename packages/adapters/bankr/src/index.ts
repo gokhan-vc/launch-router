@@ -1,4 +1,4 @@
-import { route } from "@numetal/launch-kernel";
+import { HOW_TO_SIGN, route } from "@numetal/launch-kernel";
 
 export const BANKR_DEPLOY_URL = "https://api.bankr.bot/token-launches/deploy";
 
@@ -177,6 +177,7 @@ export function draftBankr(raw: unknown) {
       ? { type: "wallet" as const, value: i.feeRecipient }
       : undefined,
   }) as BankrDeployBody;
+  const liveBody = { ...body, simulateOnly: false };
   return {
     ok: true as const,
     warnings: r.warnings,
@@ -186,8 +187,14 @@ export function draftBankr(raw: unknown) {
       method: "POST" as const,
       url: BANKR_DEPLOY_URL,
       body,
+      liveBody,
+      headers: {
+        "content-type": "application/json",
+        "X-API-Key": "bk_usr_{keyId}_{secret}",
+      },
       expectedSplit: STANDARD_SPLIT,
-      note: "Call with the user's Bankr credentials (X-API-Key: bk_usr_…). Refuse unless feeDistribution matches expectedSplit. Never send partner keys. The Mini App POSTs from the browser — the worker never sees the key.",
+      howToSign: HOW_TO_SIGN.bankr,
+      note: "Same payload for Mini App and agents. POST from the user's machine with their bk_usr_ key — never to launch.numetal.xyz, never a partner key. Simulate, check expectedSplit, then liveBody.",
     },
   };
 }

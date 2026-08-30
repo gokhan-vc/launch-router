@@ -7,6 +7,7 @@ describe("telegram commands", () => {
     expect(r.text).toMatch(/pons/);
     expect(r.text).toMatch(/unproven/);
     expect(r.text).toMatch(/Mini App/);
+    expect(r.text).toMatch(/MCP/);
   });
 
   it("/caps clanker returns wired matrix row", () => {

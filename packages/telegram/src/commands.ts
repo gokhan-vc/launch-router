@@ -10,11 +10,11 @@ export function handleCommand(text: string): TgReply {
     );
     return {
       text: [
-        "Launch router. You pick a pad. We build that pad's payload. You sign in the Mini App.",
+        "Launch router. You pick a pad. We build that pad's payload. You sign — Mini App or any agent with MCP. Same JSON.",
         "",
         ...lines,
         "",
-        "Chat cannot sign. Tap Open Mini App — you sign in the wallet there.",
+        "This chat does not hold keys. Mini App, MCP get_sign_payload, or curl: you sign.",
       ].join("\n"),
     };
   }
@@ -32,10 +32,10 @@ export function handleCommand(text: string): TgReply {
   }
   if (t.startsWith("/draft") || t.startsWith("/simulate")) {
     return {
-      text: "Send a LaunchIntent JSON, or open the Mini App. Natural language is filled against the matrix — unsupported knobs are rejected, not coerced.",
+      text: "Send a LaunchIntent JSON, open the Mini App, or call MCP get_sign_payload. Same payload. Natural language is filled against the matrix — unsupported knobs are rejected, not coerced.",
     };
   }
   return {
-    text: "Commands: /pads /caps <pad> /draft /simulate. Signing is Mini App only.",
+    text: "Commands: /pads /caps <pad> /draft /simulate. Sign in the Mini App or via MCP — same payload.",
   };
 }

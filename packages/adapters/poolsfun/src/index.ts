@@ -1,6 +1,6 @@
 import { parseEther } from "viem";
 import type { PublicClient } from "viem";
-import { route } from "@numetal/launch-kernel";
+import { HOW_TO_SIGN, route } from "@numetal/launch-kernel";
 import { PARTY_FACTORY, WETH_RH } from "./factory.js";
 import { minePoolsfunSalt, type MinedSalt } from "./mine.js";
 import {
@@ -102,7 +102,8 @@ export function draftPoolsfun(
       saltMined: extras.saltTries !== undefined,
       saltTries: extras.saltTries,
       startTickLive: extras.startTickLive,
-      note: "Salt is mined so the token sorts below WETH (TokenNotToken0). expectedStartTick is PartyFactory.startTickFor. Wallet must send this tx (creator == msg.sender).",
+      howToSign: HOW_TO_SIGN.poolsfun,
+      note: "Same PartyFactory.launch tx for Mini App Sign and MCP get_sign_payload. User wallet eth_sendTransaction(payload.tx). creator == msg.sender. Salt mined so the token sorts below WETH.",
     },
   };
 }
