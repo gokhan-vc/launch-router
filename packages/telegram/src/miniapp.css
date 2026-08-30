@@ -43,7 +43,11 @@ h1 {
 .wallet {
   color: var(--muted);
   font-size: 13px;
-  margin: 0 0 1rem;
+  margin: 0 0 0.6rem;
+}
+
+.wallet-hint {
+  margin-top: 0.4rem;
 }
 
 .banner {
@@ -70,7 +74,8 @@ label {
 input,
 select,
 button,
-pre {
+pre,
+textarea {
   font: inherit;
   text-transform: none;
   letter-spacing: 0;
@@ -100,11 +105,71 @@ select {
   width: auto;
 }
 
+details {
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.75rem;
+}
+
+details[open] {
+  padding: 0.75rem;
+}
+
+details:not([open]) > :not(summary) {
+  display: none !important;
+}
+
+summary {
+  cursor: pointer;
+  color: var(--fg);
+  letter-spacing: 0.04em;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+fieldset {
+  border: 1px solid var(--line);
+  margin: 0;
+  padding: 0.65rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+legend {
+  padding: 0 0.35rem;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+textarea {
+  font: inherit;
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--line);
+  background: var(--tg-theme-secondary-bg-color, #161616);
+  color: var(--fg);
+  border-radius: 0;
+  resize: vertical;
+  min-height: 3.5rem;
+}
+
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 0.4rem;
   margin: 1rem 0 0.5rem;
+}
+
+.actions.wallets {
+  grid-template-columns: 1fr 1fr 1fr;
+  margin: 0.35rem 0 0.75rem;
+}
+
+.payload-caption {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0 0 0.4rem;
 }
 
 button {

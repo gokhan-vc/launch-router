@@ -42,6 +42,7 @@ export function draftBankr(raw: unknown) {
   };
   return {
     ok: true as const,
+    warnings: r.warnings,
     payload: {
       pad: "bankr" as const,
       kind: "bankr-deploy-simulate" as const,

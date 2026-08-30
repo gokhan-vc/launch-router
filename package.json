@@ -12,7 +12,8 @@
     "test": "vitest run",
     "dev:miniapp": "npm run dev -w @numetal/launch-telegram",
     "build:miniapp": "npm run build -w @numetal/launch-telegram",
-    "dev:worker": "npm run build:miniapp && wrangler dev --port 8787"
+    "dev:worker": "npm run build:miniapp && wrangler dev --port 8787",
+    "mcp": "npm run mcp -w @numetal/launch-mcp"
   },
   "devDependencies": {
     "typescript": "^5.9.2",

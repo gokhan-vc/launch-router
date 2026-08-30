@@ -1,5 +1,6 @@
 import { handleCommand } from "./commands.js";
 import { parseUser, validateInitData } from "./init-data.js";
+import { handleAgentHttp } from "../../mcp/src/http.ts";
 
 export interface Env {
   ASSETS: { fetch: (req: Request) => Promise<Response> };
@@ -52,6 +53,9 @@ export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url);
 
+    const agent = await handleAgentHttp(req);
+    if (agent) return agent;
+
     if (url.pathname === "/telegram/webhook" && req.method === "POST") {
       return handleTelegram(req, env);
     }
@@ -68,8 +72,13 @@ export default {
       });
     }
 
-    if (url.pathname === "/api/health") {
-      return Response.json({ ok: true, product: "launch-router" });
+    if (url.pathname === "/api/health" || url.pathname === "/health") {
+      return Response.json({
+        ok: true,
+        product: "launch-router",
+        title: "Nuclear Crypto Launch Pad",
+        origin: "https://launch.numetal.xyz",
+      });
     }
 
     const res = await env.ASSETS.fetch(req);
@@ -80,7 +89,8 @@ export default {
       [
         "default-src 'self'",
         "script-src 'self' https://telegram.org https://cdn.jsdelivr.net",
-        "style-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
         "connect-src 'self' https: wss:",
         "img-src 'self' data: https:",
         "frame-src https:",

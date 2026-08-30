@@ -4,11 +4,20 @@
   "compatibility_date": "2026-08-27",
   "workers_dev": true,
   "preview_urls": true,
+  "routes": [{ "pattern": "launch.numetal.xyz", "custom_domain": true }],
   "assets": {
     "directory": "./packages/telegram/dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/telegram/*", "/api/*"]
+    "run_worker_first": [
+      "/telegram/*",
+      "/api/*",
+      "/mcp",
+      "/llms.txt",
+      "/AGENTS.md",
+      "/openapi.json",
+      "/.well-known/*"
+    ]
   },
   "observability": { "enabled": true }
 }

@@ -1,9 +1,11 @@
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 
 export default defineConfig({
+  plugins: [react()],
   root: fileURLToPath(new URL(".", import.meta.url)),
   resolve: {
     alias: {
@@ -16,6 +18,12 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL("./index.html", import.meta.url)),
+        app: fileURLToPath(new URL("./app.html", import.meta.url)),
+      },
+    },
   },
   server: {
     port: 5177,

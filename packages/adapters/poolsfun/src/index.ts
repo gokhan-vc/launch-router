@@ -1,10 +1,9 @@
 import { route } from "@numetal/launch-kernel";
+import { PARTY_FACTORY, WETH_RH } from "./factory.js";
+import { minePoolsfunSalt, type MinedSalt } from "./mine.js";
 
-/** Robinhood Chain PartyFactory — pools.fun, announced 2026-08-11. */
-export const PARTY_FACTORY =
-  "0x626C3d09B65bF5d1D40E0D5F25e19fa49783B3D4" as const;
-
-export const WETH_RH = "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73" as const;
+export { PARTY_FACTORY, WETH_RH } from "./factory.js";
+export { minePoolsfunSalt, saltFromInt, sortsAsToken0 } from "./mine.js";
 
 /**
  * Field map from the 2026-08-14 PALMS write. Supply, 1% fee, LP lock are
@@ -31,6 +30,8 @@ export function draftPoolsfun(
     expectedStartTick: number;
     deadline: number;
     salt: `0x${string}`;
+    predictedToken?: `0x${string}`;
+    saltTries?: number;
   },
 ) {
   const r = route(raw);
@@ -55,15 +56,16 @@ export function draftPoolsfun(
     metadataUri: i.metadataUri ?? "",
     salt: extras.salt,
     pairedAsset: paired,
-    expectedStartTick: extras.expectedStartTick,
-    deadline: extras.deadline,
+    expectedStartTick: i.expectedStartTick ?? extras.expectedStartTick,
+    deadline: i.deadline ?? extras.deadline,
     creator: i.creator as `0x${string}`,
     feeRecipient: (i.feeRecipient ?? i.creator) as `0x${string}`,
-    devBuyAmountIn: "0",
+    devBuyAmountIn: i.devBuy ? String(i.devBuy.ethAmount) : "0",
     devBuyMinOut: "0",
   };
   return {
     ok: true as const,
+    warnings: r.warnings,
     payload: {
       pad: "poolsfun" as const,
       kind: "partyfactory-launch-args" as const,
@@ -75,7 +77,52 @@ export function draftPoolsfun(
         fee: "1%",
         lp: "100% locked",
       },
-      note: "Call startTickFor on the factory for expectedStartTick. Mine salt so the token sorts below WETH. User must sign.",
+      predictedToken: extras.predictedToken,
+      saltMined: extras.saltTries !== undefined,
+      saltTries: extras.saltTries,
+      note: "Salt is mined so the token sorts below WETH (TokenNotToken0). Call startTickFor for expectedStartTick. User must sign.",
     },
   };
+}
+
+/** Draft + auto-mined CREATE2 salt. People never pick a salt. */
+export async function draftPoolsfunMined(
+  raw: unknown,
+  extras: {
+    expectedStartTick: number;
+    deadline: number;
+  },
+) {
+  const r = route(raw);
+  if (!r.ok) return { ok: false as const, errors: r.errors };
+  if (r.adapter !== "poolsfun") {
+    return { ok: false as const, errors: [`expected pad poolsfun, got ${r.adapter}`] };
+  }
+  const i = r.intent;
+  const paired =
+    !i.pairedAsset || i.pairedAsset === "WETH"
+      ? WETH_RH
+      : (i.pairedAsset as `0x${string}`);
+  let mined: MinedSalt;
+  try {
+    mined = await minePoolsfunSalt({
+      deployer: i.creator as `0x${string}`,
+      name: i.name,
+      symbol: i.symbol,
+      metadataUri: i.metadataUri ?? "",
+      pairedAsset: paired,
+    });
+  } catch (e) {
+    return {
+      ok: false as const,
+      errors: [e instanceof Error ? e.message : String(e)],
+    };
+  }
+  return draftPoolsfun(raw, {
+    expectedStartTick: extras.expectedStartTick,
+    deadline: extras.deadline,
+    salt: mined.salt,
+    predictedToken: mined.token,
+    saltTries: mined.tries,
+  });
 }

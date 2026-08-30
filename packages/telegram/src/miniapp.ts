@@ -1,44 +1,99 @@
-import { MATRIX, route, capFor, type PadId } from "@numetal/launch-kernel";
+import { MATRIX, capFor, type PadId } from "@numetal/launch-kernel";
 import { draftClanker } from "@numetal/adapter-clanker";
 import { draftBankr } from "@numetal/adapter-bankr";
-import { draftPoolsfun } from "@numetal/adapter-poolsfun";
-import { CHAINS, formToIntent, type LaunchForm } from "./form.js";
+import { draftPoolsfunMined } from "@numetal/adapter-poolsfun";
+import { CHAINS, formToIntent, pairOptionsFor, type LaunchForm } from "./form.js";
 import { bootTelegram, type WebApp } from "./telegram.js";
-import { connectInjected, switchChain, walletClient, publicClientFor, type Connected } from "./wallet.js";
+import {
+  connectInjected,
+  connectWalletConnect,
+  switchChain,
+  walletClient,
+  publicClientFor,
+  type Connected,
+} from "./wallet.js";
 
 const $ = <T extends HTMLElement>(id: string) =>
   document.getElementById(id) as T;
 
+function val(id: string) {
+  return (document.getElementById(id) as HTMLInputElement).value;
+}
+
 function form(): LaunchForm {
-  const pad = $<HTMLSelectElement>("pad").value as PadId;
-  const feesOn = !$("fees-row").hidden;
-  const poolOn = !$("pool-row").hidden;
   return {
-    name: $<HTMLInputElement>("name").value,
-    symbol: $<HTMLInputElement>("symbol").value,
-    pad,
-    chainId: Number($<HTMLSelectElement>("chain").value),
-    creator: $<HTMLInputElement>("creator").value,
-    image: $<HTMLInputElement>("image").value,
-    description: $<HTMLInputElement>("description").value,
-    metadataUri: $<HTMLInputElement>("metadata").value,
-    pairedAsset: $<HTMLSelectElement>("pair").value || undefined,
-    feeKind: feesOn
-      ? (($<HTMLSelectElement>("feeKind").value || undefined) as
-          | LaunchForm["feeKind"]
-          | undefined)
+    name: val("name"),
+    symbol: val("symbol"),
+    pad: val("pad") as PadId,
+    chainId: Number(val("chain")),
+    creator: val("creator"),
+    image: val("image"),
+    description: val("description"),
+    metadataUri: val("metadata"),
+    pairedAsset: val("pair") || undefined,
+    customPair: val("customPair"),
+    feeKind: (val("feeKind") || undefined) as LaunchForm["feeKind"],
+    feePreset: (val("feePreset") || undefined) as LaunchForm["feePreset"],
+    feePct: val("feePct") ? Number(val("feePct")) : undefined,
+    clankerFeePct: val("clankerFeePct") ? Number(val("clankerFeePct")) : undefined,
+    pairedFeePct: val("pairedFeePct") ? Number(val("pairedFeePct")) : undefined,
+    poolPositions: (val("positions") || undefined) as LaunchForm["poolPositions"],
+    tickIfToken0IsClanker: val("tick") ? Number(val("tick")) : undefined,
+    tickSpacing: val("tickSpacing") ? Number(val("tickSpacing")) : undefined,
+    mode: (val("mode") || undefined) as LaunchForm["mode"],
+    vaultPct: val("vaultPct") ? Number(val("vaultPct")) : undefined,
+    vaultLockupDays: val("vaultLockupDays")
+      ? Number(val("vaultLockupDays"))
       : undefined,
-    feePreset: feesOn
-      ? (($<HTMLSelectElement>("feePreset").value || undefined) as
-          | LaunchForm["feePreset"]
-          | undefined)
+    vaultVestDays: val("vaultVestDays") ? Number(val("vaultVestDays")) : undefined,
+    vaultRecipient: val("vaultRecipient"),
+    sniperStartPct: val("sniperStartPct")
+      ? Number(val("sniperStartPct"))
       : undefined,
-    poolPositions: poolOn
-      ? (($<HTMLSelectElement>("positions").value || undefined) as
-          | LaunchForm["poolPositions"])
+    sniperEndPct: val("sniperEndPct") ? Number(val("sniperEndPct")) : undefined,
+    sniperDecay: val("sniperDecay") ? Number(val("sniperDecay")) : undefined,
+    devBuyEth: val("devBuy") ? Number(val("devBuy")) : undefined,
+    devBuyRecipient: val("devBuyRecipient"),
+    creatorRewardPct: val("creatorRewardPct")
+      ? Number(val("creatorRewardPct"))
+      : undefined,
+    interfaceAdmin: val("interfaceAdmin"),
+    rewardRecipient: val("rewardRecipient"),
+    rewardRecipientPct: val("rewardRecipientPct")
+      ? Number(val("rewardRecipientPct"))
       : undefined,
     vanity: $<HTMLInputElement>("vanity").checked,
-    salt: $<HTMLInputElement>("salt").value,
+    tokenAdmin: val("tokenAdmin"),
+    feeRecipient: val("feeRecipient"),
+    expectedStartTick: val("expectedStartTick")
+      ? Number(val("expectedStartTick"))
+      : undefined,
+    deadline: val("deadline") ? Number(val("deadline")) : undefined,
+    twitterUrl: val("twitterUrl"),
+    websiteUrl: val("websiteUrl"),
+    telegramUrl: val("telegramUrl"),
+    airdropJson: val("airdrop"),
+    socialsJson: val("socials"),
+    auditUrls: val("auditUrls"),
+    airdropRoot: val("airdropRoot"),
+    airdropAmount: val("airdropAmount") ? Number(val("airdropAmount")) : undefined,
+    airdropLockupDays: val("airdropLockupDays")
+      ? Number(val("airdropLockupDays"))
+      : undefined,
+    airdropVestDays: val("airdropVestDays")
+      ? Number(val("airdropVestDays"))
+      : undefined,
+    airdropAdmin: val("airdropAdmin"),
+    contextInterface: val("contextInterface"),
+    contextPlatform: val("contextPlatform"),
+    locker: val("locker"),
+    lockerData: val("lockerData"),
+    poolExtAddress: val("poolExtAddress"),
+    poolExtInit: val("poolExtInit"),
+    presalePct: val("presalePct") ? Number(val("presalePct")) : undefined,
+    feesCustomJson: val("feesCustom"),
+    poolPositionsJson: val("poolPositions"),
+    rewardsJson: val("rewards"),
   };
 }
 
@@ -49,8 +104,7 @@ function setStatus(msg: string, kind: "ok" | "err" | "info" = "info") {
 }
 
 function renderPads() {
-  const sel = $<HTMLSelectElement>("pad");
-  sel.innerHTML = MATRIX.map(
+  $<HTMLSelectElement>("pad").innerHTML = MATRIX.map(
     (p) =>
       `<option value="${p.id}">${p.id}${p.status === "unproven" ? " (unproven)" : ""}</option>`,
   ).join("");
@@ -58,43 +112,61 @@ function renderPads() {
 
 function renderChains(pad: PadId) {
   const cap = capFor(pad);
-  const sel = $<HTMLSelectElement>("chain");
   const ids = cap.chains.length ? cap.chains : Object.keys(CHAINS).map(Number);
-  sel.innerHTML = ids
+  $<HTMLSelectElement>("chain").innerHTML = ids
     .map((id) => `<option value="${id}">${CHAINS[id] ?? id} (${id})</option>`)
     .join("");
+}
+
+function renderPair(pad: PadId) {
+  const sel = $<HTMLSelectElement>("pair");
+  const prev = sel.value;
+  const opts = pairOptionsFor(pad);
+  sel.innerHTML = opts
+    .map((o) => `<option value="${o.value}">${o.label}</option>`)
+    .join("");
+  sel.value = opts.some((o) => o.value === prev) ? prev : opts[0]?.value ?? "";
+  const showPair = capFor(pad).knobs.includes("pairedAsset");
+  $("pair-row").hidden = !showPair;
+  $("custom-pair-row").hidden = !showPair || pad === "pons";
+  if (!showPair) {
+    sel.value = "";
+    $<HTMLInputElement>("customPair").value = "";
+  }
 }
 
 function applyPadUi() {
   const pad = $<HTMLSelectElement>("pad").value as PadId;
   const cap = capFor(pad);
   renderChains(pad);
+  renderPair(pad);
   $("pad-notes").textContent = cap.notes;
-  const feesOff = cap.forbidden.includes("fees");
-  $("fees-row").hidden = feesOff;
-  $("pool-row").hidden = cap.forbidden.includes("pool");
   $("unproven").hidden = cap.status !== "unproven";
+  const ignore: string[] = [];
+  if (cap.forbidden.includes("fees")) ignore.push("fee kind/preset (factory hard-codes fee)");
+  if (cap.forbidden.includes("pool")) ignore.push("v4 positions/ticks");
+  $("ignored").textContent = ignore.length
+    ? `On ${pad}, Simulate will warn (not hide): ${ignore.join("; ")}.`
+    : "";
 }
 
-function payloadFor(raw: ReturnType<typeof formToIntent>) {
-  const r = route(raw);
-  if (!r.ok) return r;
-  switch (r.adapter) {
+async function payloadFor(raw: ReturnType<typeof formToIntent>) {
+  const pad = raw.pad;
+  switch (pad) {
     case "clanker":
       return draftClanker(raw);
     case "bankr":
       return draftBankr(raw);
     case "poolsfun":
-      return draftPoolsfun(raw, {
-        expectedStartTick: -190600,
-        deadline: Math.floor(Date.now() / 1000) + 3600,
-        salt: (raw.salt ||
-          "0x0000000000000000000000000000000000000000000000000000000000000001") as `0x${string}`,
+      setStatus("Mining CREATE2 salt so the token sorts below WETH…", "info");
+      return draftPoolsfunMined(raw, {
+        expectedStartTick: raw.expectedStartTick ?? -190600,
+        deadline: raw.deadline ?? Math.floor(Date.now() / 1000) + 3600,
       });
     default:
       return {
         ok: false as const,
-        errors: [`pad ${r.adapter} is unproven — no sign payload`],
+        errors: [`pad ${pad} is unproven — no sign payload`],
       };
   }
 }
@@ -105,16 +177,45 @@ function showPayload(obj: unknown) {
     (_k, v) => (typeof v === "bigint" ? v.toString() : v),
     2,
   );
+  const kind =
+    obj &&
+    typeof obj === "object" &&
+    "payload" in obj &&
+    obj.payload &&
+    typeof obj.payload === "object" &&
+    "kind" in obj.payload
+      ? String((obj.payload as { kind?: string }).kind)
+      : "";
+  const captions: Record<string, string> = {
+    "clanker-deploy-config":
+      "Clanker SDK deploy() config. Your wallet signs this. It is not a REST API request.",
+    "bankr-deploy-simulate":
+      "Bankr POST /token-launches/deploy body (simulateOnly: true). v0 does not send partner keys.",
+    "partyfactory-launch-args":
+      "pools.fun PartyFactory.launch args. Salt was mined so the token sorts below WETH. 1B / 1% / LP lock are factory-hardcoded.",
+  };
+  $("payload-caption").textContent =
+    captions[kind] ??
+    (obj && typeof obj === "object" && "ok" in obj && !(obj as { ok: boolean }).ok
+      ? "Rejected — nothing to sign."
+      : "Pad-sign payload. Not a public REST argument.");
 }
 
 let connected: Connected | null = null;
 let lastPayload: unknown = null;
 let tg: WebApp | null = null;
 
+function onWallet(c: Connected) {
+  connected = c;
+  $<HTMLInputElement>("creator").value = c.address;
+  $("wallet").textContent = `${c.source ?? "wallet"} ${c.address.slice(0, 6)}…${c.address.slice(-4)}`;
+  setStatus(`Connected ${c.address}`, "ok");
+}
+
 async function simulate() {
   try {
     const intent = formToIntent(form());
-    const r = payloadFor(intent);
+    const r = await payloadFor(intent);
     lastPayload = r;
     showPayload(r);
     if (!r.ok) {
@@ -122,7 +223,13 @@ async function simulate() {
       tg?.HapticFeedback?.impactOccurred("heavy");
       return;
     }
-    setStatus("Simulated. Review the payload, then sign in your wallet.", "ok");
+    const warns = "warnings" in r && Array.isArray(r.warnings) ? r.warnings : [];
+    setStatus(
+      warns.length
+        ? `Simulated with warnings: ${warns.join(" · ")}`
+        : "Simulated. Review the pad-sign payload below, then Sign.",
+      warns.length ? "info" : "ok",
+    );
     tg?.MainButton.setText("Sign in wallet");
     tg?.MainButton.show();
     tg?.MainButton.enable();
@@ -131,12 +238,18 @@ async function simulate() {
   }
 }
 
-async function connect() {
+async function connectBrowser() {
   try {
-    connected = await connectInjected();
-    $<HTMLInputElement>("creator").value = connected.address;
-    $("wallet").textContent = `${connected.address.slice(0, 6)}…${connected.address.slice(-4)}`;
-    setStatus(`Wallet ${connected.address}`, "ok");
+    onWallet(await connectInjected());
+  } catch (e) {
+    setStatus(e instanceof Error ? e.message : String(e), "err");
+  }
+}
+
+async function connectWc() {
+  try {
+    setStatus("Opening WalletConnect…", "info");
+    onWallet(await connectWalletConnect());
   } catch (e) {
     setStatus(e instanceof Error ? e.message : String(e), "err");
   }
@@ -148,7 +261,7 @@ async function sign() {
     if (!lastPayload || !(lastPayload as { ok?: boolean }).ok) return;
   }
   if (!connected) {
-    setStatus("Connect a wallet first. The router never holds keys.", "err");
+    setStatus("Connect Telegram wallet, WalletConnect, or a browser wallet first.", "err");
     return;
   }
   const pad = $<HTMLSelectElement>("pad").value as PadId;
@@ -165,7 +278,7 @@ async function sign() {
 
   if (pad !== "clanker") {
     setStatus(
-      `${pad} payload is ready. v0 live sign is Clanker only (SDK). Bankr/pools.fun: copy the payload; do not fake a tx.`,
+      `${pad} payload is ready. Live sign in v0 is Clanker. Other pads: you still review/sign that payload — we do not invent a tx.`,
       "info",
     );
     return;
@@ -182,36 +295,25 @@ async function sign() {
     }
     const wallet = walletClient(connected, chainId);
     const publicClient = publicClientFor(chainId);
-    const clanker = new Clanker({
-      wallet,
-      publicClient,
-    } as never);
+    const clanker = new Clanker({ wallet, publicClient } as never);
     const cfg = drafted.payload.config;
-    const { txHash, waitForTransaction, error } = await clanker.deploy({
-      name: cfg.name,
-      symbol: cfg.symbol,
-      tokenAdmin: cfg.tokenAdmin,
-      chainId: cfg.chainId,
-      image: cfg.image,
-      vanity: cfg.vanity,
-    });
+    const { txHash, waitForTransaction, error } = await clanker.deploy(
+      cfg as never,
+    );
     if (error) throw error;
-    const rec = waitForTransaction ? await waitForTransaction() : { address: undefined };
+    const rec = waitForTransaction
+      ? await waitForTransaction()
+      : { address: undefined };
     showPayload({ txHash, token: rec });
     setStatus(
       rec && "address" in rec && rec.address
-        ? `Launched ${rec.address} on Clanker. Token lives on that pad.`
+        ? `Launched ${rec.address} on Clanker.`
         : `Submitted ${txHash}`,
       "ok",
     );
     tg?.HapticFeedback?.impactOccurred("soft");
   } catch (e) {
-    setStatus(
-      e instanceof Error
-        ? e.message
-        : "Clanker SDK could not run in this client. Payload is still in the panel — sign from a wallet that can load clanker-sdk.",
-      "err",
-    );
+    setStatus(e instanceof Error ? e.message : String(e), "err");
   }
 }
 
@@ -221,14 +323,40 @@ function main() {
   applyPadUi();
   $("who").textContent = tg?.initDataUnsafe?.user?.username
     ? `@${tg.initDataUnsafe.user.username}`
-    : tg
+    : tg?.initData
       ? "Telegram"
       : "browser preview";
 
   $("pad").addEventListener("change", applyPadUi);
-  $("connect").addEventListener("click", () => void connect());
+  $("connect").addEventListener("click", () => void connectBrowser());
+  $("connect-wc").addEventListener("click", () => void connectWc());
   $("simulate").addEventListener("click", () => void simulate());
   $("sign").addEventListener("click", () => void sign());
+
+  let privy: { login: () => void } | null | undefined;
+  async function ensurePrivy() {
+    if (privy !== undefined) return privy;
+    const { mountPrivy } = await import("./privy-mount.js");
+    privy = mountPrivy($("privy-root"), onWallet);
+    return privy;
+  }
+
+  $("connect-tg").addEventListener("click", () => {
+    void (async () => {
+      setStatus("Opening Telegram login…", "info");
+      const p = await ensurePrivy();
+      if (p) p.login();
+      else
+        setStatus(
+          "Set VITE_PRIVY_APP_ID so Telegram Mini App login can mint an embedded EVM wallet. Official @wallet is TON and cannot sign Clanker.",
+          "err",
+        );
+    })();
+  });
+
+  if (import.meta.env.VITE_PRIVY_APP_ID && tg?.initData) {
+    void ensurePrivy().then((p) => p?.login());
+  }
 
   if (tg) {
     tg.MainButton.setText("Simulate");

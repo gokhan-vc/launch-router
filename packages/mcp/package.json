@@ -3,8 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "test": "vitest run" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./http": "./src/http.ts"
+  },
+  "bin": {
+    "launch-router-mcp": "./src/stdio.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "mcp": "npx tsx src/stdio.ts"
+  },
   "dependencies": {
     "@numetal/launch-kernel": "*",
     "@numetal/adapter-clanker": "*",

@@ -28,7 +28,7 @@ describe("draftPoolsfun", () => {
     }
   });
 
-  it("rejects dynamic fees at the kernel", () => {
+  it("keeps dynamic fees visible and warns instead of rejecting", () => {
     const r = draftPoolsfun(
       {
         name: "PALMS",
@@ -44,6 +44,10 @@ describe("draftPoolsfun", () => {
         salt: "0x0000000000000000000000000000000000000000000000000000000000000001",
       },
     );
-    expect(r.ok).toBe(false);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.warnings.some((w) => /ignored/i.test(w))).toBe(true);
+      expect(r.payload.args.name).toBe("PALMS");
+    }
   });
 });

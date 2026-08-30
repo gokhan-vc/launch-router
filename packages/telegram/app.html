@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Sign — Nuclear Crypto Launch Pad</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+    <link rel="stylesheet" href="./src/miniapp.css" />
+  </head>
+  <body>
+    <header>
+      <p class="kicker"><a href="/">Nuclear Crypto Launch Pad</a> · you sign</p>
+      <h1>Pick a pad. You sign.</h1>
+      <p class="who" id="who"></p>
+    </header>
+
+    <p class="notes wallet-hint">
+      Telegram login mints an embedded EVM wallet (Privy) that can sign Clanker.
+      Official @wallet is TON and cannot. WalletConnect brings MetaMask / Rainbow
+      into the Mini App.
+    </p>
+    <div class="actions wallets">
+      <button type="button" id="connect-tg">Telegram wallet</button>
+      <button type="button" id="connect-wc">WalletConnect</button>
+      <button type="button" id="connect">Browser wallet</button>
+    </div>
+    <div id="privy-root"></div>
+    <p class="wallet" id="wallet">no wallet · router never holds keys</p>
+
+    <p id="unproven" class="banner" hidden>
+      This pad is on the matrix but has no proven deploy API. We will not fake a
+      transaction.
+    </p>
+    <p id="pad-notes" class="notes"></p>
+    <p id="ignored" class="notes"></p>
+
+    <form id="form" autocomplete="off">
+      <label>Pad <select id="pad"></select></label>
+      <label>Chain <select id="chain"></select></label>
+      <label>Name <input id="name" required maxlength="32" placeholder="PALMS" /></label>
+      <label>Symbol <input id="symbol" required maxlength="12" placeholder="PALMS" /></label>
+      <label>Image URL <input id="image" placeholder="ipfs://… or https://…" /></label>
+      <label>Description <input id="description" /></label>
+      <label>X / Twitter URL <input id="twitterUrl" placeholder="https://x.com/…" /></label>
+      <label>Website URL <input id="websiteUrl" placeholder="https://…" /></label>
+      <label>Telegram URL <input id="telegramUrl" placeholder="https://t.me/…" /></label>
+      <label id="pair-row">
+        Pair
+        <select id="pair"></select>
+      </label>
+      <label id="custom-pair-row">Custom pair (0x…) <input id="customPair" placeholder="0x…" /></label>
+      <label>Creator (signer) <input id="creator" placeholder="0x… or connect" /></label>
+      <label>Fee recipient <input id="feeRecipient" placeholder="defaults to signer" /></label>
+
+      <details id="advanced">
+        <summary>Advanced</summary>
+        <p class="notes">Optional. Leave blank for pad defaults. Ignored fields warn on Simulate.</p>
+
+        <fieldset>
+          <legend>Fees</legend>
+          <label>Launch mode
+            <select id="mode">
+              <option value="">(pad default)</option>
+              <option value="instant">instant</option>
+              <option value="curve">curve</option>
+              <option value="crowd">crowd</option>
+            </select>
+          </label>
+          <label>Fee kind
+            <select id="feeKind">
+              <option value="">(pad default)</option>
+              <option value="static">static</option>
+              <option value="dynamic">dynamic</option>
+            </select>
+          </label>
+          <label>Fee preset
+            <select id="feePreset">
+              <option value="">(pad default)</option>
+              <option>StaticBasic</option>
+              <option>DynamicBasic</option>
+              <option>Dynamic3</option>
+            </select>
+          </label>
+          <label>Swap fee % <input id="feePct" type="number" min="0" step="0.01" placeholder="1 = 1%" /></label>
+          <label>Token-side fee % <input id="clankerFeePct" type="number" min="0" step="0.01" /></label>
+          <label>Pair-side fee % <input id="pairedFeePct" type="number" min="0" step="0.01" /></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Pool / vault / buy</legend>
+          <label>v4 positions
+            <select id="positions">
+              <option value="">(pad default)</option>
+              <option>Standard</option>
+              <option>Project</option>
+              <option>TwentyETH</option>
+            </select>
+          </label>
+          <label>Start tick <input id="tick" type="number" placeholder="-230400" /></label>
+          <label>Tick spacing <input id="tickSpacing" type="number" placeholder="200" /></label>
+          <label>Vault % <input id="vaultPct" type="number" min="0" max="100" /></label>
+          <label>Vault lockup (days) <input id="vaultLockupDays" type="number" min="0" /></label>
+          <label>Vault vest (days) <input id="vaultVestDays" type="number" min="0" /></label>
+          <label>Vault recipient <input id="vaultRecipient" /></label>
+          <label>Sniper start fee % <input id="sniperStartPct" type="number" min="0" step="0.01" placeholder="66.68" /></label>
+          <label>Sniper end fee % <input id="sniperEndPct" type="number" min="0" step="0.01" placeholder="4.17" /></label>
+          <label>Sniper decay (sec) <input id="sniperDecay" type="number" placeholder="15" /></label>
+          <label>Dev buy (ETH) <input id="devBuy" type="number" step="0.0001" /></label>
+          <label>Dev buy recipient <input id="devBuyRecipient" /></label>
+          <label>Creator reward % <input id="creatorRewardPct" type="number" min="0" max="100" step="0.01" placeholder="100" /></label>
+          <label>Interface admin <input id="interfaceAdmin" /></label>
+          <label>Reward recipient <input id="rewardRecipient" placeholder="0x… extra split" /></label>
+          <label>That recipient % <input id="rewardRecipientPct" type="number" min="0" max="100" step="0.01" /></label>
+          <label>Presale % <input id="presalePct" type="number" min="0" max="100" step="0.01" /></label>
+          <label class="check"><input id="vanity" type="checkbox" /> Vanity address (0x…b07)</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Admin / airdrop / extra URLs</legend>
+          <label>Token admin <input id="tokenAdmin" placeholder="defaults to signer" /></label>
+          <label>Metadata URI <input id="metadata" /></label>
+          <label>Audit URL <input id="auditUrls" placeholder="https://…" /></label>
+          <label>Airdrop merkle root <input id="airdropRoot" placeholder="0x…" /></label>
+          <label>Airdrop amount <input id="airdropAmount" type="number" min="0" /></label>
+          <label>Airdrop lockup (days) <input id="airdropLockupDays" type="number" min="0" /></label>
+          <label>Airdrop vest (days) <input id="airdropVestDays" type="number" min="0" /></label>
+          <label>Airdrop admin <input id="airdropAdmin" /></label>
+          <label>Locker <input id="locker" placeholder="Locker or 0x…" /></label>
+          <label>Locker data <input id="lockerData" placeholder="0x" /></label>
+          <label>Pool extension address <input id="poolExtAddress" placeholder="0x…" /></label>
+          <label>Pool extension init data <input id="poolExtInit" placeholder="0x" /></label>
+          <label>Context interface <input id="contextInterface" placeholder="numetal-launch-router" /></label>
+          <label>Context platform <input id="contextPlatform" placeholder="telegram" /></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>pools.fun</legend>
+          <label>Start tick quote <input id="expectedStartTick" type="number" placeholder="-190600" /></label>
+          <label>Deadline (unix) <input id="deadline" type="number" /></label>
+        </fieldset>
+
+        <details>
+          <summary>Raw JSON (optional)</summary>
+          <p class="notes">Only if you already have a blob. Everyone else can ignore this.</p>
+          <label>Custom fees JSON <textarea id="feesCustom" rows="3"></textarea></label>
+          <label>Custom v4 positions JSON <textarea id="poolPositions" rows="3"></textarea></label>
+          <label>Rewards recipients JSON <textarea id="rewards" rows="3"></textarea></label>
+          <label>Airdrop JSON <textarea id="airdrop" rows="3"></textarea></label>
+          <label>Socials JSON <textarea id="socials" rows="2"></textarea></label>
+        </details>
+      </details>
+    </form>
+
+    <div class="actions">
+      <button type="button" id="simulate">Simulate</button>
+      <button type="button" id="sign" class="primary">Sign</button>
+    </div>
+    <p id="status" data-kind="info">
+      The JSON below is the pad payload your wallet signs — not a public REST
+      argument.
+    </p>
+    <p class="payload-caption" id="payload-caption">
+      Simulate to see it. Clanker → SDK deploy config. Bankr → POST
+      /token-launches/deploy body with simulateOnly. pools.fun →
+      PartyFactory.launch args (1B / 1% / LP lock are factory-hardcoded).
+    </p>
+    <pre id="payload"></pre>
+    <script type="module" src="./src/miniapp.ts"></script>
+  </body>
+</html>

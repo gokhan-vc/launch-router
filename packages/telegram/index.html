@@ -2,116 +2,311 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nuclear Crypto Launch Pad — Numetal</title>
     <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
+      name="description"
+      content="A joke title. This is a pad aggregator: pick Clanker, Bankr, or pools.fun, we build that pad’s payload, you sign. People and machines, side by side."
     />
-    <title>Launch router</title>
-    <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
-    <link rel="stylesheet" href="./src/miniapp.css" />
+    <link rel="canonical" href="https://launch.numetal.xyz/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content="Nuclear Crypto Launch Pad" />
+    <meta
+      property="og:description"
+      content="Not a launchpad. Pick an existing pad. You sign. Free x402 / MCP API."
+    />
+    <meta property="og:url" content="https://launch.numetal.xyz/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #111;
+        --mute: #666;
+        --line: #e4e4e4;
+        --bg: #fafafa;
+        --card: #fff;
+        --col-people: #f6f1e8;
+        --col-machines: #eef2f6;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        line-height: 1.5;
+      }
+      a { color: inherit; }
+      a:hover { color: var(--mute); }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 1.15rem 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--card);
+      }
+      header img { width: 40px; height: 40px; }
+      header strong {
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        font-size: 1.05rem;
+      }
+      header nav {
+        margin-left: auto;
+        display: flex;
+        gap: 1.1rem;
+        font-size: 0.92rem;
+      }
+      main { max-width: 72rem; margin: 0 auto; padding: 2.2rem 5vw 4rem; }
+      .joke {
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--mute);
+        margin: 0 0 0.55rem;
+      }
+      h1 {
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-weight: 500;
+        font-size: clamp(1.9rem, 4vw, 2.8rem);
+        line-height: 1.15;
+        margin: 0 0 0.7rem;
+        max-width: 18ch;
+      }
+      .lead {
+        max-width: 46rem;
+        color: #333;
+        font-size: 1.05rem;
+        margin: 0 0 1.5rem;
+      }
+      .lead em { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; }
+      .cta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2.2rem; }
+      .btn {
+        display: inline-block;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: #fff;
+        padding: 0.5rem 0.95rem;
+        text-decoration: none;
+        font-size: 0.95rem;
+      }
+      .btn.ghost { background: transparent; color: var(--ink); }
+      .btn:hover { color: #fff; background: #333; }
+      .btn.ghost:hover { color: var(--ink); background: var(--card); }
+      h2 {
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-weight: 500;
+        font-size: 1.2rem;
+        margin: 0 0 0.85rem;
+      }
+      .board {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+      }
+      .col { background: var(--card); padding: 1.15rem 1.2rem 1.4rem; min-height: 100%; }
+      .col.people { background: var(--col-people); }
+      .col.machines { background: var(--col-machines); }
+      .col h2 { margin-bottom: 0.25rem; }
+      .col .who {
+        font-size: 0.88rem;
+        color: var(--mute);
+        margin: 0 0 1rem;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        padding: 0.85rem 0.95rem;
+        margin: 0 0 0.65rem;
+      }
+      .card h3 {
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-weight: 500;
+        font-size: 1rem;
+        margin: 0 0 0.3rem;
+      }
+      .card p { margin: 0; font-size: 0.92rem; color: #333; }
+      .card a { text-underline-offset: 2px; }
+      .pads {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+        margin: 2rem 0 0;
+      }
+      .pad {
+        background: var(--card);
+        padding: 1rem 1.1rem;
+      }
+      .pad .k {
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--mute);
+      }
+      .pad h3 {
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-weight: 500;
+        font-size: 1.05rem;
+        margin: 0.15rem 0 0.35rem;
+      }
+      .pad p { margin: 0; font-size: 0.9rem; color: #333; }
+      footer {
+        margin-top: 2.5rem;
+        padding-top: 1.1rem;
+        border-top: 1px solid var(--line);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.9rem 1.4rem;
+        font-size: 0.9rem;
+        color: var(--mute);
+      }
+      footer a { color: var(--ink); }
+      .fine {
+        flex-basis: 100%;
+        font-size: 0.82rem;
+        max-width: 44rem;
+        line-height: 1.45;
+      }
+      code { font-family: inherit; font-size: 0.92em; }
+      @media (max-width: 800px) {
+        .board, .pads { grid-template-columns: 1fr; }
+        header nav { display: none; }
+      }
+    </style>
   </head>
   <body>
     <header>
-      <p class="kicker">NUMETAL · LAUNCH ROUTER</p>
-      <h1>Pick a pad. You sign.</h1>
-      <p class="who" id="who"></p>
+      <img src="/nautilus.svg" alt="" width="40" height="40" />
+      <strong>Launch</strong>
+      <nav>
+        <a href="/app.html">Sign</a>
+        <a href="/llms.txt">llms.txt</a>
+        <a href="/openapi.json">API</a>
+        <a href="https://github.com/gokhan-vc/launch-router">GitHub</a>
+      </nav>
     </header>
 
-    <p id="unproven" class="banner" hidden>
-      This pad is on the matrix but has no proven deploy API. We will not fake a
-      transaction.
-    </p>
-
-    <form id="form" autocomplete="off">
-      <label>
-        Pad
-        <select id="pad"></select>
-      </label>
-      <p class="notes" id="pad-notes"></p>
-      <label>
-        Chain
-        <select id="chain"></select>
-      </label>
-      <label>
-        Name
-        <input id="name" required maxlength="32" placeholder="PALMS" />
-      </label>
-      <label>
-        Symbol
-        <input id="symbol" required maxlength="12" placeholder="PALMS" />
-      </label>
-      <label>
-        Image URL
-        <input id="image" placeholder="ipfs://… or https://…" />
-      </label>
-      <label>
-        Description
-        <input id="description" />
-      </label>
-      <label>
-        Metadata URI
-        <input id="metadata" />
-      </label>
-      <label>
-        Pair
-        <select id="pair">
-          <option value="WETH">WETH</option>
-          <option value="USDG">USDG</option>
-          <option value="RH_STOCK">RH stock (Pons only)</option>
-        </select>
-      </label>
-      <div id="fees-row">
-        <label>
-          Fee kind
-          <select id="feeKind">
-            <option value="static">static</option>
-            <option value="dynamic">dynamic</option>
-          </select>
-        </label>
-        <label>
-          Fee preset
-          <select id="feePreset">
-            <option>StaticBasic</option>
-            <option>DynamicBasic</option>
-            <option>Dynamic3</option>
-          </select>
-        </label>
+    <main>
+      <p class="joke">A Numetal product · the title is a joke</p>
+      <h1>Nuclear Crypto Launch Pad</h1>
+      <p class="lead">
+        We are <em>not</em> a launchpad. You pick an existing one — Clanker, Bankr, pools.fun —
+        we build <em>that pad’s</em> payload, and <em>you</em> sign. No bot wallet. No broadcast
+        tool. The token lives on the pad you chose.
+      </p>
+      <div class="cta">
+        <a class="btn" href="/app.html">Open the Mini App — you sign</a>
+        <a class="btn ghost" href="/llms.txt">Agent instructions</a>
       </div>
-      <div id="pool-row">
-        <label>
-          v4 positions
-          <select id="positions">
-            <option>Standard</option>
-            <option>Project</option>
-            <option>TwentyETH</option>
-          </select>
-        </label>
-      </div>
-      <label class="check">
-        <input id="vanity" type="checkbox" />
-        Vanity address (Clanker)
-      </label>
-      <label>
-        Salt (pools.fun token0)
-        <input id="salt" placeholder="0x…" />
-      </label>
-      <label>
-        Creator (signer)
-        <input id="creator" placeholder="0x… or connect wallet" />
-      </label>
-    </form>
 
-    <div class="actions">
-      <button type="button" id="connect">Connect wallet</button>
-      <button type="button" id="simulate">Simulate</button>
-      <button type="button" id="sign" class="primary">Sign</button>
-    </div>
-    <p class="wallet" id="wallet">no wallet · router never holds keys</p>
-    <p id="status" data-kind="info">
-      Simulate builds the pad’s payload. Sign is your wallet. Chat cannot
-      broadcast.
-    </p>
-    <pre id="payload"></pre>
-    <script type="module" src="./src/miniapp.ts"></script>
+      <h2>What people and machines can do</h2>
+      <div class="board" aria-label="Kanban: people and machines">
+        <section class="col people">
+          <h2>People</h2>
+          <p class="who">A wallet. A form. A signature. That’s the whole human path.</p>
+          <article class="card">
+            <h3>Mini App</h3>
+            <p>
+              <a href="/app.html">launch.numetal.xyz/app.html</a> — pick pad, chain, name, ticker.
+              Advanced knobs stay visible; the matrix warns if a pad ignores them.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Connect</h3>
+            <p>
+              Browser wallet, WalletConnect, or Telegram (Privy embedded EVM wallet). Official
+              Telegram @wallet is TON and cannot sign these deploys.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Simulate, then sign</h3>
+            <p>
+              Simulate shows the object your wallet signs — not a REST argument. Live Sign in v0
+              is Clanker. Bankr and pools.fun stop at the payload. Unproven pads are blocked.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Telegram</h3>
+            <p>
+              Bot <code>/start</code> opens the Mini App. Chat cannot broadcast. You still sign.
+            </p>
+          </article>
+        </section>
+        <section class="col machines">
+          <h2>Machines</h2>
+          <p class="who">Free discovery. User still signs. Amount 0 on x402 and MPP.</p>
+          <article class="card">
+            <h3>MCP</h3>
+            <p>
+              <a href="/mcp">POST /mcp</a> JSON-RPC, or stdio <code>npx tsx packages/mcp/src/stdio.ts</code>.
+              Tools: list_pads, list_networks, get_capabilities, draft_intent, simulate_launch,
+              get_sign_payload. There is no broadcast.
+            </p>
+          </article>
+          <article class="card">
+            <h3>REST</h3>
+            <p>
+              <a href="/openapi.json">POST /api/v1/{tool}</a> — body is the tool arguments.
+              Same kernel as the Mini App.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Skill</h3>
+            <p>
+              <a href="/skill.md">/skill.md</a> for Cursor, Claude, Grok, Codex, Aeon
+              (<code>category: crypto</code>, <code>mode: read-only</code>). Unattended Aeon
+              notifies the sign payload and stops.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Discovery</h3>
+            <p>
+              <a href="/.well-known/x402">/.well-known/x402</a> (amount <em>0</em>) ·
+              <a href="/.well-known/mpp.json">/.well-known/mpp.json</a> (price <em>0</em>) ·
+              <a href="/llms.txt">/llms.txt</a> · catalogued at
+              <a href="https://api.gokhan.vc/">api.gokhan.vc</a>.
+            </p>
+          </article>
+        </section>
+      </div>
+
+      <div class="pads">
+        <div class="pad">
+          <div class="k">Wired · live sign</div>
+          <h3>Clanker</h3>
+          <p>SDK deploy config. Base, Sepolia, ETH, Arb, BSC, Unichain, Robinhood, Monad, Abstract.</p>
+        </div>
+        <div class="pad">
+          <div class="k">Wired · payload</div>
+          <h3>Bankr</h3>
+          <p>simulateOnly POST body. Split 57 / 36.1 / 1.9 / 5 of 1.2%. Base + Robinhood.</p>
+        </div>
+        <div class="pad">
+          <div class="k">Wired · payload</div>
+          <h3>pools.fun</h3>
+          <p>PartyFactory.launch on Robinhood. Salt mined. 1B / 1% / LP lock are factory-hardcoded.</p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <a href="https://numetal.xyz">numetal.xyz</a>
+      <a href="https://gokhan.vc">gokhan.vc</a>
+      <a href="https://x.com/goekhanvc">@goekhanvc</a>
+      <p class="fine">
+        Numetal Labs · Nuclear Crypto Launch Pad · Doc LR-001 · not a launchpad, not
+        coins.numetal.xyz, not investment advice.
+      </p>
+    </footer>
   </body>
 </html>

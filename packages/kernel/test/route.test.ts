@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { route } from "../src/route.js";
+import { networks } from "../src/matrix.js";
 import type { LaunchIntent } from "../src/intent.js";
 
 const signer = "0x1111111111111111111111111111111111111111" as const;
@@ -17,7 +18,7 @@ function clankerBase(over: Partial<LaunchIntent> = {}): LaunchIntent {
 }
 
 describe("route", () => {
-  it("rejects poolsfun + dynamic fees", () => {
+  it("keeps poolsfun + dynamic fees available, warns instead of hiding", () => {
     const r = route({
       name: "Palms",
       symbol: "PALMS",
@@ -26,11 +27,9 @@ describe("route", () => {
       creator: signer,
       fees: { kind: "dynamic", preset: "DynamicBasic" },
     });
-    expect(r.ok).toBe(false);
-    if (!r.ok) {
-      expect(r.errors.some((e) => /fees/i.test(e) && /poolsfun/i.test(e))).toBe(
-        true,
-      );
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.warnings.some((w) => /ignored/i.test(w))).toBe(true);
     }
   });
 
@@ -55,12 +54,33 @@ describe("route", () => {
     if (!r.ok) expect(r.errors.some((e) => /unproven/i.test(e))).toBe(true);
   });
 
+  it("exposes Monad and Abstract on the clanker network list", () => {
+    const ids = networks().map((n) => n.chainId);
+    expect(ids).toContain(10143);
+    expect(ids).toContain(2741);
+  });
+
   it("accepts clanker Base + StaticBasic", () => {
     const r = route(clankerBase());
     expect(r.ok).toBe(true);
     if (r.ok) {
       expect(r.adapter).toBe("clanker");
       expect(r.intent.fees?.preset).toBe("StaticBasic");
+    }
+  });
+
+  it("warns when poolsfun is given a vault instead of hiding the field", () => {
+    const r = route({
+      name: "PALMS",
+      symbol: "PALMS",
+      chainId: 4663,
+      pad: "poolsfun",
+      creator: signer,
+      vault: { percentage: 10, lockupDuration: 86400 },
+    });
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.warnings.some((w) => /vault/i.test(w))).toBe(true);
     }
   });
 });

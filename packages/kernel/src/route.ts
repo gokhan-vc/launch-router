@@ -5,6 +5,7 @@ export type RouteOk = {
   ok: true;
   adapter: PadId;
   intent: LaunchIntent;
+  warnings: string[];
 };
 
 export type RouteErr = {
@@ -25,6 +26,7 @@ export function route(raw: unknown): RouteResult {
   const intent = parsed.data;
   const cap = capFor(intent.pad);
   const errors: string[] = [];
+  const warnings: string[] = [];
 
   if (cap.status === "unproven") {
     errors.push(
@@ -45,8 +47,8 @@ export function route(raw: unknown): RouteResult {
   }
 
   if (intent.fees && cap.forbidden.includes("fees")) {
-    errors.push(
-      `pad ${intent.pad} does not take a fees knob (hard-coded on that factory)`,
+    warnings.push(
+      `${intent.pad} factory hard-codes the swap fee; fee fields are shown but ignored`,
     );
   }
 
@@ -54,15 +56,32 @@ export function route(raw: unknown): RouteResult {
     intent.fees?.kind === "dynamic" &&
     (cap.forbidden.includes("fees.dynamic") || cap.forbidden.includes("fees"))
   ) {
-    errors.push(
-      `pad ${intent.pad} does not support dynamic fees`,
-    );
+    warnings.push(`${intent.pad} does not support dynamic fees; ignored`);
   }
 
   if (intent.pool && cap.forbidden.includes("pool")) {
-    errors.push(`pad ${intent.pad} does not expose Uniswap v4 pool knobs`);
+    warnings.push(
+      `${intent.pad} does not take Uniswap v4 pool knobs; pool fields ignored`,
+    );
+  }
+
+  const core = new Set([
+    "name",
+    "symbol",
+    "chainId",
+    "pad",
+    "creator",
+  ]);
+  const allowed = new Set([...core, ...cap.knobs]);
+  for (const [key, value] of Object.entries(intent)) {
+    if (value === undefined || value === null || value === false) continue;
+    if (allowed.has(key)) continue;
+    if (cap.forbidden.some((f) => f === key || f.startsWith(`${key}.`))) continue;
+    warnings.push(
+      `${intent.pad} does not use ${key}; field is visible but omitted from the sign payload`,
+    );
   }
 
   if (errors.length) return { ok: false, errors };
-  return { ok: true, adapter: intent.pad, intent };
+  return { ok: true, adapter: intent.pad, intent, warnings };
 }

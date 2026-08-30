@@ -4,7 +4,7 @@ The human surface for launch-router. Kernel runs in the client. **You sign.** Th
 
 ```bash
 # from repo root
-npm run dev:miniapp     # http://localhost:5177  (open in a browser to preview)
+npm run dev:miniapp     # http://localhost:5177  foyer; Sign is /app.html
 npm run build:miniapp
 npm run dev:worker      # serves dist + /telegram/webhook + /api/*
 ```
@@ -19,14 +19,31 @@ npm run dev:worker      # serves dist + /telegram/webhook + /api/*
 
 ## Wallet
 
-Telegram WebView has no `window.ethereum`.
+Telegram WebView has no `window.ethereum`. Official Telegram **@wallet is TON** and cannot sign Clanker / Bankr / pools.fun (EVM).
 
-| Env | What happens |
+| Env / button | What happens |
 |---|---|
-| Desktop browser + MetaMask | Connect works (injected). Clanker **Sign** can call `clanker-sdk`. |
-| `VITE_WC_PROJECT_ID` | WalletConnect (not wired in v0 UI yet — use injected or Privy). |
-| `VITE_PRIVY_APP_ID` | Zero-click Telegram login + embedded wallet (Privy). App id required; not bundled until set. |
-| Neither, inside Telegram | Simulate still works. Sign is disabled until a wallet provider exists. |
+| **Telegram wallet** + `VITE_PRIVY_APP_ID` | Privy Telegram login. Inside the Mini App this is seamless (`initData`); it mints an **embedded EVM wallet** (`createOnLogin: all-users`) that can sign Clanker. App id only — never a Privy secret in `VITE_`. |
+| **WalletConnect** + `VITE_WC_PROJECT_ID` | Reown Cloud project. QR / deep-link to MetaMask, Rainbow, etc. from inside Telegram. |
+| **Browser wallet** | Injected `window.ethereum` (MetaMask on desktop). |
+| None of the above | Simulate still works. Sign is refused until a wallet exists. |
+
+`packages/telegram/.env.local` holds public ids. Production should use a dedicated Privy app (not the datebook one) with `https://web.telegram.org` in allowed domains.
+
+## What the JSON panel is
+
+It is **not** a public REST argument. After Simulate it is the **pad-sign payload**:
+
+| Pad | `payload.kind` | What you sign |
+|---|---|---|
+| Clanker | `clanker-deploy-config` | Clanker SDK `deploy()` config |
+| Bankr | `bankr-deploy-simulate` | `POST /token-launches/deploy` body, `simulateOnly: true` |
+| pools.fun | `partyfactory-launch-args` | `PartyFactory.launch` named args (1B / 1% / LP lock are factory-hardcoded) |
+| unproven | — | no payload; we do not fake a tx |
+
+Advanced fields stay visible on every pad. If the pad ignores one, Simulate **warns** and omits it from that payload.
+
+CREATE2 **salt is never a form field**. Clanker’s SDK fills it (and mines `0x…b07` when Vanity is checked). pools.fun mines a salt via `PartyFactory.computeTokenAddress` so the token sorts below WETH (`TokenNotToken0` otherwise). The mined salt still appears in the sign payload because the tx needs it — people do not type it.
 
 ## Pads
 

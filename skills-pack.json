@@ -1,0 +1,19 @@
+{
+  "name": "Numetal launch router",
+  "version": "0.1.0",
+  "description": "Pad aggregator: draft a Clanker / Bankr / pools.fun sign payload. User signs. Never broadcast.",
+  "author": "gokhan",
+  "skills": [
+    {
+      "slug": "launch-router",
+      "path": "skills/launch-router",
+      "description": "Route a token launch through an existing pad. Drafts a wallet-sign payload. Never broadcasts.",
+      "category": "crypto",
+      "schedule": "workflow_dispatch",
+      "default_enabled": false,
+      "secrets_required": [],
+      "secrets_optional": ["LAUNCH_ROUTER_ORIGIN"],
+      "capabilities": ["read_only", "external_api", "sends_notifications"]
+    }
+  ]
+}

@@ -11,6 +11,7 @@ export type Connected = {
   address: `0x${string}`;
   chainId: number;
   provider: EthereumProvider;
+  source?: "injected" | "walletconnect" | "telegram";
 };
 
 type EthereumProvider = {
@@ -44,7 +45,46 @@ export async function connectInjected(): Promise<Connected> {
   const chainHex = (await provider.request({ method: "eth_chainId" })) as string;
   const address = accounts[0] as `0x${string}`;
   if (!address) throw new Error("wallet returned no account");
-  return { address, chainId: Number.parseInt(chainHex, 16), provider };
+  return {
+    address,
+    chainId: Number.parseInt(chainHex, 16),
+    provider,
+    source: "injected",
+  };
+}
+
+export async function connectWalletConnect(): Promise<Connected> {
+  const projectId = import.meta.env.VITE_WC_PROJECT_ID as string | undefined;
+  if (!projectId) {
+    throw new Error(
+      "Set VITE_WC_PROJECT_ID (Reown Cloud) to connect wallets inside Telegram.",
+    );
+  }
+  const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
+  const provider = await EthereumProvider.init({
+    projectId,
+    showQrModal: true,
+    optionalChains: [8453, 84532, 1, 42161, 56, 130, 4663],
+    metadata: {
+      name: "Numetal launch router",
+      description: "Pick a pad. You sign.",
+      url: globalThis.location?.origin ?? "https://numetal.xyz",
+      icons: ["https://numetal.xyz/favicon.ico"],
+    },
+  });
+  await provider.connect();
+  const accounts = (await provider.request({
+    method: "eth_requestAccounts",
+  })) as string[];
+  const chainHex = (await provider.request({ method: "eth_chainId" })) as string;
+  const address = accounts[0] as `0x${string}`;
+  if (!address) throw new Error("WalletConnect returned no account");
+  return {
+    address,
+    chainId: Number.parseInt(chainHex, 16),
+    provider: provider as unknown as EthereumProvider,
+    source: "walletconnect",
+  };
 }
 
 export async function switchChain(

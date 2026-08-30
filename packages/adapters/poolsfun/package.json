@@ -5,6 +5,9 @@
   "type": "module",
   "exports": { ".": "./src/index.ts" },
   "scripts": { "test": "vitest run" },
-  "dependencies": { "@numetal/launch-kernel": "*" },
+  "dependencies": {
+    "@numetal/launch-kernel": "*",
+    "viem": "^2.33.0"
+  },
   "devDependencies": { "typescript": "^5.9.2", "vitest": "^3.2.4" }
 }
