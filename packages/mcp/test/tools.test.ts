@@ -8,7 +8,7 @@ import {
   list_networks,
 } from "../src/index.js";
 import { handleJsonRpc } from "../src/jsonrpc.js";
-import { x402WellKnown, mppWellKnown } from "../src/discovery.js";
+import { x402WellKnown, mppWellKnown, openapi } from "../src/discovery.js";
 
 describe("mcp tools", () => {
   it("exposes no broadcast tool", () => {
@@ -62,6 +62,20 @@ describe("mcp tools", () => {
     ).toBe(true);
     const m = mppWellKnown("https://example.test");
     expect(m.price).toBe("0");
+  });
+
+  it("openapi marks every operation free so x402 bazaar skips 402 probes", () => {
+    const spec = openapi("https://example.test") as {
+      security: unknown;
+      paths: Record<string, { post: { security: unknown } }>;
+    };
+    expect(spec.security).toEqual([]);
+    const paths = Object.keys(spec.paths);
+    expect(paths).toContain("/mcp");
+    expect(paths).toHaveLength(8);
+    for (const p of paths) {
+      expect(spec.paths[p].post.security).toEqual([]);
+    }
   });
 
   it("dispatch list_pads returns the matrix", async () => {

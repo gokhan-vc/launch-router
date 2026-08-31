@@ -1,6 +1,12 @@
-import { dispatch, TOOL_DEFS } from "./tools.js";
+import { dispatch } from "./tools.js";
 import { handleJsonRpc, type JsonRpcReq } from "./jsonrpc.js";
-import { mcpManifest, mppWellKnown, originFrom, x402WellKnown } from "./discovery.js";
+import {
+  mcpManifest,
+  mppWellKnown,
+  openapi,
+  originFrom,
+  x402WellKnown,
+} from "./discovery.js";
 import { LLMS_TXT } from "./llms.js";
 
 const CORS = {
@@ -56,30 +62,4 @@ export async function handleAgentHttp(req: Request): Promise<Response | null> {
     }
   }
   return null;
-}
-
-function openapi(origin: string) {
-  const paths: Record<string, unknown> = {};
-  for (const t of TOOL_DEFS) {
-    paths[`/api/v1/${t.name}`] = {
-      post: {
-        operationId: t.name,
-        summary: t.description,
-        requestBody: {
-          content: { "application/json": { schema: t.inputSchema } },
-        },
-        responses: { "200": { description: "ok" } },
-      },
-    };
-  }
-  return {
-    openapi: "3.1.0",
-    info: {
-      title: "Numetal launch router",
-      version: "0.1.0",
-      description: "Free. User signs. No broadcast.",
-    },
-    servers: [{ url: origin }],
-    paths,
-  };
 }

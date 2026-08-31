@@ -80,7 +80,9 @@ describe("landing", () => {
     }
     expect(landing).toMatch(/people and machines/i);
     expect(landing).toContain("https://t.me/numetalxyz");
-    expect(landing).toMatch(/There is no bot to/);
+    expect(landing).toContain("t.me/botusername/appname");
+    expect(landing).toContain("t.me/botusername?startapp");
+    expect(landing).toMatch(/We don’t have that bot yet|We don't have that bot yet/);
     expect(landing).not.toMatch(/Bot <code>\/start<\/code> opens/);
   });
 });

@@ -13,4 +13,4 @@ export {
 } from "./tools.js";
 export { handleJsonRpc } from "./jsonrpc.js";
 export { handleAgentHttp } from "./http.js";
-export { x402WellKnown, mppWellKnown, mcpManifest } from "./discovery.js";
+export { x402WellKnown, mppWellKnown, mcpManifest, openapi } from "./discovery.js";

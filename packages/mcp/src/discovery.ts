@@ -1,5 +1,8 @@
 import { TOOL_DEFS } from "./tools.js";
 
+/** Free APIs: x402 Bazaar must not probe these for a 402. */
+const FREE_SECURITY: [] = [];
+
 const USDC_BASE = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 export function originFrom(req?: Request): string {
@@ -83,5 +86,56 @@ export function mcpManifest(origin: string) {
     stdio: "npx tsx packages/mcp/src/stdio.ts",
     tools: TOOL_DEFS.map((t) => t.name),
     docs: `${origin}/llms.txt`,
+  };
+}
+
+/**
+ * OpenAPI for the REST surface. Every operation is free — `security: []`
+ * so x402 Bazaar does not probe them for a 402 (amount is already `"0"`).
+ */
+export function openapi(origin: string) {
+  const paths: Record<string, unknown> = {
+    "/mcp": {
+      post: {
+        operationId: "mcp",
+        summary:
+          "MCP JSON-RPC 2.0 (initialize, tools/list, tools/call). Free. Same tools as /api/v1/{tool}.",
+        security: FREE_SECURITY,
+        requestBody: {
+          content: {
+            "application/json": {
+              schema: { type: "object", additionalProperties: true },
+            },
+          },
+        },
+        responses: { "200": { description: "JSON-RPC result" } },
+      },
+    },
+  };
+  for (const t of TOOL_DEFS) {
+    paths[`/api/v1/${t.name}`] = {
+      post: {
+        operationId: t.name,
+        summary: t.description,
+        security: FREE_SECURITY,
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: t.inputSchema } },
+        },
+        responses: { "200": { description: "ok" } },
+      },
+    };
+  }
+  return {
+    openapi: "3.1.0",
+    info: {
+      title: "Numetal launch router",
+      version: "0.1.0",
+      description:
+        "Free. User signs. No broadcast. Not x402-paid — security is empty so bazaar skips 402 probes.",
+    },
+    servers: [{ url: origin }],
+    security: FREE_SECURITY,
+    paths,
   };
 }
