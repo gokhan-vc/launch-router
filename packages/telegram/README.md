@@ -9,13 +9,17 @@ npm run build:miniapp
 npm run dev:worker      # serves dist + /telegram/webhook + /api/*
 ```
 
-## Bot
+## Bot (optional, not shipped)
 
-1. @BotFather → `/newbot` → `/setmenubutton` → Mini App URL.
-2. Set webhook: `https://api.telegram.org/bot$TOKEN/setWebhook?url=$ORIGIN/telegram/webhook`
-3. `.dev.vars`: `TELEGRAM_BOT_TOKEN`, `MINIAPP_URL` (HTTPS origin of the Mini App).
+There is **no public launch bot**. People open [launch.numetal.xyz/app.html](https://launch.numetal.xyz/app.html). `/start` is every Telegram bot’s default — it is not a product URL.
 
-`/start` and `/pads` reply with **Open Mini App — you sign**.
+To attach a bot later:
+
+1. @BotFather → `/newbot` → `/setmenubutton` → `https://launch.numetal.xyz/app.html`
+2. Set webhook: `https://api.telegram.org/bot$TOKEN/setWebhook?url=https://launch.numetal.xyz/telegram/webhook`
+3. Worker secrets: `TELEGRAM_BOT_TOKEN`, `MINIAPP_URL=https://launch.numetal.xyz/app.html`
+
+Then put the bot’s `t.me/<handle>` on the landing page. Until that exists, do not tell people to `/start`.
 
 ## Wallet
 
