@@ -6,6 +6,7 @@ import {
   get_sign_payload,
   list_pads,
   list_networks,
+  handleAgentHttp,
 } from "../src/index.js";
 import { handleJsonRpc } from "../src/jsonrpc.js";
 import { x402WellKnown, mppWellKnown, openapi } from "../src/discovery.js";
@@ -54,8 +55,11 @@ describe("mcp tools", () => {
     expect(names).not.toContain("broadcast");
   });
 
-  it("x402 and MPP catalogs are free", () => {
+  it("x402 and MPP catalogs are amount 0 and uniquely addressed", () => {
     const x = x402WellKnown("https://example.test");
+    expect(x.resources).toHaveLength(8);
+    const urls = x.resources.map((r) => r.resource);
+    expect(new Set(urls).size).toBe(8);
     expect(x.resources.every((r) => r.accepts[0].amount === "0")).toBe(true);
     expect(
       x.resources.every((r) => r.extensions.bazaar.discoverable === true),
@@ -64,18 +68,46 @@ describe("mcp tools", () => {
     expect(m.price).toBe("0");
   });
 
-  it("openapi marks every operation free so x402 bazaar skips 402 probes", () => {
+  it("openapi declares x402 (amount 0), not security []", () => {
     const spec = openapi("https://example.test") as {
       security: unknown;
-      paths: Record<string, { post: { security: unknown } }>;
+      paths: Record<string, { post: { security: unknown; responses: Record<string, unknown> } }>;
     };
-    expect(spec.security).toEqual([]);
+    expect(spec.security).toEqual([{ x402: [] }]);
     const paths = Object.keys(spec.paths);
-    expect(paths).toContain("/mcp");
     expect(paths).toHaveLength(8);
     for (const p of paths) {
-      expect(spec.paths[p].post.security).toEqual([]);
+      expect(spec.paths[p].post.security).toEqual([{ x402: [] }]);
+      expect(spec.paths[p].post.responses["402"]).toBeTruthy();
     }
+  });
+
+  it("bare POST 402s before validation; payment header lets the call through for $0", async () => {
+    const bare = await handleAgentHttp(
+      new Request("https://example.test/api/v1/list_pads", { method: "POST" }),
+    );
+    expect(bare?.status).toBe(402);
+    expect(bare?.headers.get("PAYMENT-REQUIRED")).toBeTruthy();
+    const body = (await bare!.json()) as {
+      x402Version: number;
+      accepts: { amount: string }[];
+    };
+    expect(body.x402Version).toBe(2);
+    expect(body.accepts[0].amount).toBe("0");
+
+    const paid = await handleAgentHttp(
+      new Request("https://example.test/api/v1/list_pads", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "PAYMENT-SIGNATURE": "e30=",
+        },
+        body: "{}",
+      }),
+    );
+    expect(paid?.status).toBe(200);
+    const rows = (await paid!.json()) as { id: string }[];
+    expect(rows.some((p) => p.id === "clanker")).toBe(true);
   });
 
   it("dispatch list_pads returns the matrix", async () => {

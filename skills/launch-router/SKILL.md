@@ -84,7 +84,7 @@ Unproven (matrix only — no fake tx): pons, feelcash (letscash.fun SDK exists, 
 ## Network note
 
 - MCP: `./aeon mcp add launch-router "$ORIGIN/mcp"` (HTTP, no auth). Tools: `mcp__launch-router__*` (Claude) / `launch-router__*` (grok). Discover from the server; never call a tool named `broadcast` / `send_transaction` / `deploy`.
-- HTTP fallback: `POST {origin}/api/v1/{tool}` — body = tool arguments. Also `POST {origin}/mcp` JSON-RPC. `GET {origin}/llms.txt`, `GET {origin}/.well-known/x402` (amount `"0"`), `GET {origin}/.well-known/mpp.json` (price `"0"`).
+- HTTP fallback: `POST {origin}/api/v1/{tool}` is **x402 amount 0**. Bare POST → 402; retry with `PAYMENT-SIGNATURE` (or `X-Payment`) for **$0**. Same for `POST {origin}/mcp`. `GET {origin}/llms.txt`, `GET {origin}/.well-known/x402`, `GET {origin}/.well-known/mpp.json` are unpaid GETs.
 - Default public origin is `https://launch.numetal.xyz`. Unattended GitHub Actions cannot reach `localhost`.
 - `./secretcurl` with `{LAUNCH_ROUTER_ORIGIN}` only if the origin is stored as a repo secret. Public URLs: plain `curl`. Never put a key on the command line.
 - Stdio MCP (`npm run mcp`) is for local hosts (Cursor, Claude Code, Grok, Codex), not Aeon Actions.

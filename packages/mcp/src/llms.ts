@@ -79,5 +79,5 @@ Not a public REST argument. It is the object the **user** signs, identical on Mi
 
 ## Discovery
 
-Freely listed. x402 \`accepts[].amount\` is \`"0"\`. MPP \`price\` is \`"0"\`. No API key.
+HTTP REST and \`POST /mcp\` are **x402 amount 0**. Bare POST → **402** with \`PAYMENT-REQUIRED\`. Retry with \`PAYMENT-SIGNATURE\` (or \`X-Payment\`) — **$0**, no on-chain transfer. Discovery files (\`/.well-known/x402\`, OpenAPI, llms.txt) stay GET-free. Stdio MCP has no HTTP 402. MPP \`price\` is \`"0"\`.
 `;

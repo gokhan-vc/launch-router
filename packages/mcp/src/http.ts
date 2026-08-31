@@ -1,4 +1,4 @@
-import { dispatch } from "./tools.js";
+import { dispatch, TOOL_DEFS } from "./tools.js";
 import { handleJsonRpc, type JsonRpcReq } from "./jsonrpc.js";
 import {
   mcpManifest,
@@ -8,13 +8,33 @@ import {
   x402WellKnown,
 } from "./discovery.js";
 import { LLMS_TXT } from "./llms.js";
+import {
+  challengeBody,
+  hasPaymentHeader,
+  paymentRequiredResponse,
+} from "./x402.js";
 
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-headers":
-    "content-type, x-payment, authorization, payment-signature",
+    "content-type, x-payment, authorization, payment-signature, PAYMENT-SIGNATURE, PAYMENT-RESPONSE, PAYMENT-REQUIRED",
   "access-control-allow-methods": "GET, POST, OPTIONS",
 };
+
+function paidOrChallenge(
+  req: Request,
+  resourcePath: string,
+  description: string,
+  inputSchema?: Record<string, unknown>,
+): Response | null {
+  if (req.method !== "POST") return null;
+  if (hasPaymentHeader(req)) return null;
+  const origin = originFrom(req);
+  return paymentRequiredResponse(
+    challengeBody(`${origin}${resourcePath}`, description, inputSchema),
+    CORS,
+  );
+}
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data, null, 2), {
@@ -40,6 +60,12 @@ export async function handleAgentHttp(req: Request): Promise<Response | null> {
   if (url.pathname === "/openapi.json") return json(openapi(origin));
 
   if (url.pathname === "/mcp" && req.method === "POST") {
+    const gate = paidOrChallenge(
+      req,
+      "/mcp",
+      "MCP JSON-RPC. x402 amount 0.",
+    );
+    if (gate) return gate;
     const body = (await req.json()) as JsonRpcReq;
     const out = await handleJsonRpc(body);
     if (out == null) return new Response(null, { status: 204, headers: CORS });
@@ -50,6 +76,14 @@ export async function handleAgentHttp(req: Request): Promise<Response | null> {
   const api = url.pathname.match(/^\/api\/v1\/([a-z_]+)$/);
   if (api && req.method === "POST") {
     const name = api[1];
+    const def = TOOL_DEFS.find((t) => t.name === name);
+    const gate = paidOrChallenge(
+      req,
+      `/api/v1/${name}`,
+      def?.description ?? name,
+      def?.inputSchema as Record<string, unknown> | undefined,
+    );
+    if (gate) return gate;
     const args = (await req.json().catch(() => ({}))) as Record<string, unknown>;
     try {
       const result = await dispatch(name, args);
